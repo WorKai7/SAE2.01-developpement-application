@@ -10,10 +10,12 @@ class VueFirstApp(QMainWindow):
         Elle ne représente que le visuel et est liée au modèle dans le fichier Controller.py
     '''
 
+    newClicked = pyqtSignal()
+
     def __init__(self):
         super().__init__()
 
-        self.resize(800, 500)
+        self.resize(1280, 720)
         self.move(300, 150)
 
         # Barre de menu et catégories
@@ -66,7 +68,7 @@ class VueFirstApp(QMainWindow):
             Elle émet simplement un signal vers l'extérieur
         '''
         
-        pass
+        self.newClicked.emit()
 
     def open(self):
         '''
