@@ -1,12 +1,16 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton
-from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QFileDialog
+from PyQt6.QtCore import QSize, Qt, pyqtSignal
 
 class NewProjectApp(QWidget):
+
+    infosSignal = pyqtSignal(dict)
+
     def __init__(self) -> None:
         super().__init__()
 
         self.resize(800, 500)
+        self.setWindowTitle("Nouveau projet")
 
         layout = QVBoxLayout() ; self.setLayout(layout)
 
@@ -41,15 +45,23 @@ class NewProjectApp(QWidget):
 
 
     def create(self):
-        infos = {
-            "project_name": self.project_name.text(),
-        }
+        path = QFileDialog.getSaveFileName()[0]
 
-        self.close()
-        print(infos)
+        if path:
 
-        # Faudra voir pour renvoyer les infos au modele pour pouvoir les traiter après
-        return infos
+            if path[-5:] != ".json":
+                path += ".json"
+
+            infos = {
+                "project_name": self.project_name.text(),
+                "project_author": self.project_author.text(),
+                "shop_name": self.shop_name.text(),
+                "shop_address": self.shop_address.text(),
+                "file_path": path
+            }
+
+            self.close()
+            self.infosSignal.emit(infos)
 
 
 class Champ(QLineEdit):

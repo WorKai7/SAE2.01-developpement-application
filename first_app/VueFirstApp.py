@@ -17,6 +17,7 @@ class VueFirstApp(QMainWindow):
 
         self.resize(1280, 720)
         self.move(300, 150)
+        self.setWindowTitle("Sans nom")
 
         # Barre de menu et catégories
         menu_bar = self.menuBar()
