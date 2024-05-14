@@ -2,6 +2,7 @@ import sys
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtWidgets import QWidget
 
 
 class VueFirstApp(QMainWindow):
@@ -11,12 +12,12 @@ class VueFirstApp(QMainWindow):
     '''
 
     newClicked = pyqtSignal()
+    loadClicked = pyqtSignal()
 
     def __init__(self):
         super().__init__()
 
-        self.resize(1280, 720)
-        self.move(300, 150)
+        self.resize(int(QApplication.screens()[0].size().width()), int(QApplication.screens()[0].size().height()))
         self.setWindowTitle("Sans nom")
 
         # Barre de menu et catégories
@@ -28,10 +29,16 @@ class VueFirstApp(QMainWindow):
         menu_fichier.addAction("Enregistrer", self.save)
         menu_fichier.addAction("Enregistrer sous..", self.save_as)
 
+        menu_edition = menu_bar.addMenu("&Edition")
+        menu_edition.addAction("Charger un plan de magasin", self.load)
+
         menu_theme = menu_bar.addMenu("&Thèmes")
         menu_theme.addAction("Clair", self.applyBrightTheme)
         menu_theme.addAction("Sombre", self.applyDarkTheme)
         menu_theme.addAction("Défaut", self.resetTheme)
+
+        self.main_widget = MainWidget()
+        self.setCentralWidget(self.main_widget)
 
         self.show()
         
@@ -95,7 +102,37 @@ class VueFirstApp(QMainWindow):
 
         pass
 
+    def load(self):
+        '''
+            Méthode load: permet à l'utilisateur de charger le plan d'un magasin
+            Elle émet simplement un signal vers l'extérieur
+        '''
 
+        self.loadClicked.emit()
+
+
+class MainWidget(QWidget):
+    def __init__(self) -> None:
+        super().__init__()
+
+        layout = QVBoxLayout() ; self.setLayout(layout)
+
+        self.image = Image("../images/vide.png")
+
+        layout.addStretch()
+        layout.addWidget(self.image, alignment=Qt.AlignmentFlag.AlignCenter)
+
+
+class Image(QLabel):
+    '''
+        Classe image: cette classe correspond à l'image qui sera associée au plan
+    '''
+
+    def __init__(self, chemin:str):
+        super().__init__()
+
+        self.image = QPixmap(chemin).scaledToHeight(int(QApplication.screens()[0].size().height()*0.7))
+        self.setPixmap(self.image)
 
 
 if __name__ == "__main__":

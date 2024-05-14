@@ -7,6 +7,7 @@ class ModeleFirstApp:
     def __init__(self) -> None:
         self.new_window = None
         self.current_infos = {}
+        self.image_path = None
 
 
     def new(self):
