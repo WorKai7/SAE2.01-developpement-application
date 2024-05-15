@@ -23,6 +23,8 @@ class NewProjectApp(QWidget):
 
         layout = QVBoxLayout() ; self.setLayout(layout)
 
+        self.setStyleSheet("QWidget{ background-color: white; }  QLabel{ font-size: 18px; } QLineEdit { border: 2px solid; border-radius: 8px; padding-left: 10px; height: 20px }") # commun a tous les éléments de la page
+
         self.project_name_label = QLabel("Nom du projet:")
         self.project_name = Champ("Ex: Projet 1")
         self.project_author_label = QLabel("Nom de l'auteur du projet:")
@@ -37,6 +39,7 @@ class NewProjectApp(QWidget):
         self.select_image_button.setFixedWidth(150)
         self.create_button = QPushButton("Créer")
         self.create_button.setFixedWidth(150)
+        self.create_button.setStyleSheet("background-color: #5DF07D; color: white; font-size: 16px; border: 2px solid; border-radius: 2px")
 
         self.create_button.clicked.connect(self.create)
         self.select_image_button.clicked.connect(self.browse)
