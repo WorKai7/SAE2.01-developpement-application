@@ -9,6 +9,15 @@ class NewProjectApp(QWidget):
     def __init__(self) -> None:
         super().__init__()
 
+        self.infos = {
+            "project_name": "Sans nom",
+            "project_author": "Sans nom",
+            "shop_name": "Sans nom",
+            "shop_address": "Sans nom",
+            "file_path": None,
+            "image": "../images/vide.png"
+        }
+
         self.resize(800, 500)
         self.setWindowTitle("Nouveau projet")
 
@@ -22,10 +31,15 @@ class NewProjectApp(QWidget):
         self.shop_name = Champ("Ex: Monoprix")
         self.shop_address_label = QLabel("Adresse du magasin:")
         self.shop_address = Champ("Ex: 4894984 Rue de la paix, MontCul")
+        self.image_path = Champ("Chemin de l'image")
+        self.image_path.setDisabled(True)
+        self.select_image_button = QPushButton("Parcourir")
+        self.select_image_button.setFixedWidth(150)
         self.create_button = QPushButton("Créer")
         self.create_button.setFixedWidth(150)
 
         self.create_button.clicked.connect(self.create)
+        self.select_image_button.clicked.connect(self.browse)
 
         layout.addStretch()
         layout.addWidget(self.project_name_label, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -40,28 +54,33 @@ class NewProjectApp(QWidget):
         layout.addWidget(self.shop_address_label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.shop_address, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addSpacing(30)
+        layout.addWidget(self.image_path, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.select_image_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addSpacing(30)
         layout.addWidget(self.create_button, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addStretch()
 
 
     def create(self):
-        path = QFileDialog.getSaveFileName()[0]
+        self.infos["project_name"] = self.project_name.text()
+        self.infos["project_author"] = self.project_author.text()
+        self.infos["shop_name"] = self.shop_name.text()
+        self.infos["shop_address"] = self.shop_address.text()
 
-        if path:
+        self.close()
+        self.infosSignal.emit(self.infos)
 
-            if path[-5:] != ".json":
-                path += ".json"
+    def browse(self):
+        image = QFileDialog.getOpenFileName()[0]
 
-            infos = {
-                "project_name": self.project_name.text(),
-                "project_author": self.project_author.text(),
-                "shop_name": self.shop_name.text(),
-                "shop_address": self.shop_address.text(),
-                "file_path": path
-            }
-
-            self.close()
-            self.infosSignal.emit(infos)
+        if image:
+            if image[-4:] == ".png" or image[-4:] == ".jpg" or image[-4:] == ".svg" or image[-5:] == ".jpeg":
+                self.infos["image"] = image
+                self.image_path.setText(image)
+            else:
+                print("Erreur d'extension de fichier d'image")
+        else:
+            print("Pas de fichier sélectionné")
 
 
 class Champ(QLineEdit):

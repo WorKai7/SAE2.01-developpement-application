@@ -13,12 +13,15 @@ class VueFirstApp(QMainWindow):
 
     newClicked = pyqtSignal()
     loadClicked = pyqtSignal()
+    saveClicked = pyqtSignal()
+    saveasClicked = pyqtSignal()
+    openClicked = pyqtSignal()
 
     def __init__(self):
         super().__init__()
 
         self.resize(int(QApplication.screens()[0].size().width()), int(QApplication.screens()[0].size().height()))
-        self.setWindowTitle("Sans nom")
+        self.setWindowTitle("Projet sans nom")
 
         # Barre de menu et catégories
         menu_bar = self.menuBar()
@@ -84,7 +87,7 @@ class VueFirstApp(QMainWindow):
             Elle émet simplement un signal vers l'extérieur
         '''
 
-        pass
+        self.openClicked.emit()
 
     def save(self):
         '''
@@ -92,7 +95,7 @@ class VueFirstApp(QMainWindow):
             Elle émet simplement un signal vers l'extérieur
         '''
 
-        pass
+        self.saveClicked.emit()
 
     def save_as(self):
         '''
@@ -100,7 +103,7 @@ class VueFirstApp(QMainWindow):
             Elle émet simplement un signal vers l'extérieur
         '''
 
-        pass
+        self.saveasClicked.emit()
 
     def load(self):
         '''

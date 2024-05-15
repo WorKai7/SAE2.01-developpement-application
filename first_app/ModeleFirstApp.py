@@ -1,23 +1,42 @@
 import json
-from PyQt6.QtWidgets import QFileDialog, QApplication
-from NewProjectApp import NewProjectApp
+from PyQt6.QtWidgets import QFileDialog
 
 class ModeleFirstApp:
 
     def __init__(self) -> None:
-        self.new_window = None
-        self.current_infos = {}
-        self.image_path = None
+        self.current_infos = {
+            "project_name": "Sans nom",
+            "project_author": "Sans nom",
+            "shop_name": "Sans nom",
+            "shop_address": "Sans nom",
+            "file_path": None,
+            "image": "../images/vide.png"
+        }
 
 
-    def new(self):
-        self.new_window = NewProjectApp()
-        self.new_window.show()
+    def save(self):
+        if not self.current_infos["file_path"]:
+            self.save_as()
+        else:
+            with open(self.current_infos["file_path"], 'w') as f:
+                json.dump(self.current_infos, f, indent=4)
 
-        self.new_window.infosSignal.connect(self.create_file)
+    def save_as(self):
+        path = QFileDialog.getSaveFileName()[0]
 
-    def create_file(self, d:dict):
-        self.current_infos = d
+        if path:
+            if path[-5:] != ".json":
+                path += ".json"
 
-        with open(self.current_infos["file_path"], 'w') as f:
-            json.dump(self.current_infos, f, indent=4)
+            self.current_infos["file_path"] = path
+
+            with open(path, 'w') as f:
+                json.dump(self.current_infos, f, indent=4)
+
+    def open(self):
+        path = QFileDialog.getOpenFileName()[0]
+
+        if path:
+            if path[-5:] == ".json":
+               with open(path, 'r') as f:
+                self.current_infos = json.load(path)
