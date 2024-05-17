@@ -16,6 +16,8 @@ class Controller:
         self.vue.saveClicked.connect(self.modele.save)
         self.vue.saveasClicked.connect(self.modele.save_as)
         self.vue.openClicked.connect(self.open)
+        self.vue.main_widget.options.drawClicked.connect(self.draw_grid)
+        self.vue.main_widget.options.clearClicked.connect(self.clear_grid)
 
 
     def new(self):
@@ -33,17 +35,24 @@ class Controller:
         if image:
             if image[-4:] == ".png" or image[-4:] == ".jpg" or image[-4:] == ".svg" or image[-5:] == ".jpeg":
                 self.modele.current_infos["image"] = image
-                self.update_vue(image, self.modele.current_infos["project_name"], self.modele.current_infos["file_path"])
+                self.vue.main_widget.grid.image = image
+                self.vue.main_widget.grid.update()
+                self.vue.setWindowTitle(self.modele.current_infos["project_name"] + " - " + self.modele.current_infos["file_path"])
 
     def open(self):
         self.modele.open()
         self.update_vue(self.modele.current_infos["image"], self.modele.current_infos["project_name"], self.modele.current_infos["file_path"])
 
-    def update_vue(self, image, title, path):
-        self.vue.main_widget.image.setPixmap(QPixmap(image).scaledToHeight(int(QApplication.screens()[0].size().height()*0.7)))
-        self.vue.setWindowTitle(title + " - " + path)
+    def draw_grid(self, size:tuple):
+        if self.vue.main_widget.grid.grid:
+            self.vue.main_widget.grid.clear_grid()
 
+        self.vue.main_widget.grid.width = size[0]
+        self.vue.main_widget.grid.height = size[1]
+        self.vue.main_widget.grid.draw_grid()
 
+    def clear_grid(self):
+        self.vue.main_widget.grid.clear_grid()
 
 if __name__ == "__main__":
 

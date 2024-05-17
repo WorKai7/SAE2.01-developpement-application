@@ -13,6 +13,10 @@ class ModeleFirstApp:
             "image": "../images/vide.png"
         }
 
+        self.grid = []
+        self.grid_width = 0
+        self.grid_height = 0
+
 
     def save(self):
         if not self.current_infos["file_path"]:
