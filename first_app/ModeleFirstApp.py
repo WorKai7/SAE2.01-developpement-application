@@ -8,6 +8,9 @@ class ModeleFirstApp:
         self.new_window = None
         self.current_infos = {}
         self.image_path = None
+        self.grid = []
+        self.grid_width = 0
+        self.grid_height = 0
 
 
     def new(self):

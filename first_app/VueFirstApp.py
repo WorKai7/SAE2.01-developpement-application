@@ -1,7 +1,7 @@
 import sys
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtGui import QIcon, QPixmap, QPainter
 from PyQt6.QtWidgets import QWidget
 
 
@@ -115,24 +115,86 @@ class MainWidget(QWidget):
     def __init__(self) -> None:
         super().__init__()
 
-        layout = QVBoxLayout() ; self.setLayout(layout)
+        layout = QHBoxLayout() ; self.setLayout(layout)
 
-        self.image = Image("../images/vide.png")
+        self.options = Options()
+        self.grid = Grid()
 
-        layout.addStretch()
-        layout.addWidget(self.image, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.options)
+        layout.addWidget(self.grid)
 
-
-class Image(QLabel):
-    '''
-        Classe image: cette classe correspond à l'image qui sera associée au plan
-    '''
-
-    def __init__(self, chemin:str):
+class Grid(QWidget):
+    def __init__(self, width:int=0, height:int=0) -> None:
         super().__init__()
 
-        self.image = QPixmap(chemin).scaledToHeight(int(QApplication.screens()[0].size().height()*0.7))
-        self.setPixmap(self.image)
+        self.layout = QGridLayout() ; self.setLayout(self.layout)
+
+        self.image = "../images/vide.png"
+        self.width = width
+        self.height = height
+
+        self.grid = []
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        pixmap = QPixmap(self.image)
+        painter.drawPixmap(self.rect(), pixmap)
+        super().paintEvent(event)
+
+    def draw_grid(self):
+        for i in range(self.height):
+            row = []
+            for j in range(self.width):
+                case = QCheckBox()
+                row.append(case)
+                self.layout.addWidget(case, i, j)
+            self.grid.append(row)
+
+    def clear_grid(self):
+        for i in range(self.height-1, -1, -1):
+            for j in range(self.width-1, -1, -1):
+                self.layout.removeWidget(self.grid[i][j])
+                del self.grid[i][j]
+        self.grid.clear()
+
+
+class Options(QWidget):
+
+    drawClicked = pyqtSignal(tuple)
+    clearClicked = pyqtSignal()
+
+    def __init__(self) -> None:
+        super().__init__()
+
+        self.setFixedWidth(int(QApplication.screens()[0].size().width()*0.3))
+
+        layout = QVBoxLayout() ; self.setLayout(layout)
+
+        self.row_label = QLabel("Nombre de lignes")
+        self.row_number = QSpinBox()
+        self.column_label = QLabel("Nombre de colonnes")
+        self.column_number = QSpinBox()
+        self.draw_grid_button = QPushButton("Dessiner la grille")
+        self.clear_grid_button = QPushButton("Effacer la grille")
+
+        layout.addWidget(self.row_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.row_number, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.column_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.column_number, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.draw_grid_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.clear_grid_button, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.draw_grid_button.clicked.connect(self.dessinClicked)
+        self.clear_grid_button.clicked.connect(self.effaceClicked)
+
+
+    def dessinClicked(self):
+        self.drawClicked.emit((self.column_number.value(), self.row_number.value()))
+
+    def effaceClicked(self):
+        self.clearClicked.emit()
+
+
 
 
 if __name__ == "__main__":

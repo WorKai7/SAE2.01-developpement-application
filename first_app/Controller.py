@@ -11,6 +11,8 @@ class Controller:
 
         self.vue.newClicked.connect(self.modele.new)
         self.vue.loadClicked.connect(self.load)
+        self.vue.main_widget.options.drawClicked.connect(self.draw_grid)
+        self.vue.main_widget.options.clearClicked.connect(self.clear_grid)
 
 
     def load(self):
@@ -18,7 +20,19 @@ class Controller:
         if image:
             if image[-4:] == ".png" or image[-4:] == ".jpg" or image[-4:] == ".svg" or image[-5:] == ".jpeg":
                 self.modele.image_path = image
-                self.vue.main_widget.image.setPixmap(QPixmap(image).scaledToHeight(int(QApplication.screens()[0].size().height()*0.7)))
+                self.vue.main_widget.grid.image = image
+                self.vue.main_widget.grid.update()
+
+    def draw_grid(self, size:tuple):
+        if self.vue.main_widget.grid.grid:
+            self.vue.main_widget.grid.clear_grid()
+
+        self.vue.main_widget.grid.width = size[0]
+        self.vue.main_widget.grid.height = size[1]
+        self.vue.main_widget.grid.draw_grid()
+
+    def clear_grid(self):
+        self.vue.main_widget.grid.clear_grid()
 
 
 
