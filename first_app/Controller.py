@@ -35,13 +35,16 @@ class Controller:
         if image:
             if image[-4:] == ".png" or image[-4:] == ".jpg" or image[-4:] == ".svg" or image[-5:] == ".jpeg":
                 self.modele.current_infos["image"] = image
-                self.vue.main_widget.grid.image = image
-                self.vue.main_widget.grid.update()
-                self.vue.setWindowTitle(self.modele.current_infos["project_name"] + " - " + self.modele.current_infos["file_path"])
+                self.update_vue()
 
     def open(self):
         self.modele.open()
-        self.update_vue(self.modele.current_infos["image"], self.modele.current_infos["project_name"], self.modele.current_infos["file_path"])
+        self.update_vue()
+
+    def update_vue(self):
+        self.vue.setWindowTitle(self.modele.current_infos["project_name"] + " - " + self.modele.current_infos["file_path"])
+        self.vue.main_widget.grid.image = self.modele.current_infos["image"]
+        self.vue.main_widget.grid.update()
 
     def draw_grid(self, size:tuple):
         if self.vue.main_widget.grid.grid:

@@ -43,4 +43,4 @@ class ModeleFirstApp:
         if path:
             if path[-5:] == ".json":
                with open(path, 'r') as f:
-                self.current_infos = json.load(path)
+                self.current_infos = json.load(f)
