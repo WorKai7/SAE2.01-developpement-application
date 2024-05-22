@@ -77,9 +77,6 @@ class NewProjectApp(QWidget):
         self.infosSignal.emit(self.infos)
 
     def browse(self):
-        dialog = QFileDialog()
-        dialog.setNameFilters(["Fichier PNG (*.png)", "Fichier JPG (*.jpg)"])
-
         image = QFileDialog.getOpenFileName(self, "Choisissez le plan", "", "Fichier PNG (*.png) ;; Fichier JPG (*.jpg *.jpeg) ;; Fichier SVG (*.svg)")[0]
 
         if image:

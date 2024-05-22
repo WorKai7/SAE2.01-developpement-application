@@ -31,15 +31,14 @@ class Controller:
         self.update_vue(self.modele.current_infos["image"], self.modele.current_infos["project_name"], self.modele.current_infos["file_path"])
 
     def load(self):
-        image = QFileDialog.getOpenFileName()[0]
+        image = QFileDialog.getOpenFileName(caption="Sélectionner un plan", filter="Fichier PNG (*.png) ;; Fichier JPG (*.jpg *.jpeg) ;; Fichier SVG (*.svg)")[0]
         if image:
-            if image[-4:] == ".png" or image[-4:] == ".jpg" or image[-4:] == ".svg" or image[-5:] == ".jpeg":
-                self.modele.current_infos["image"] = image
-                self.update_vue()
+            self.modele.current_infos["image"] = image
+            self.update_vue()
 
     def open(self):
-        self.modele.open()
-        self.update_vue()
+        if self.modele.open():
+            self.update_vue()
 
     def update_vue(self):
         self.vue.setWindowTitle(self.modele.current_infos["project_name"] + " - " + self.modele.current_infos["file_path"])
