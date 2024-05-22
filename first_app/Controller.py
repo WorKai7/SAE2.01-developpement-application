@@ -44,18 +44,18 @@ class Controller:
     def update_vue(self):
         self.vue.setWindowTitle(self.modele.current_infos["project_name"] + " - " + self.modele.current_infos["file_path"])
         self.vue.main_widget.grid.image = self.modele.current_infos["image"]
+        self.vue.main_widget.grid.draw_grid(self.modele.current_infos["grid"])
         self.vue.main_widget.grid.update()
 
     def draw_grid(self, size:tuple):
-        if self.vue.main_widget.grid.grid:
-            self.vue.main_widget.grid.clear_grid()
+        self.clear_grid()
 
-        self.vue.main_widget.grid.width = size[0]
-        self.vue.main_widget.grid.height = size[1]
-        self.vue.main_widget.grid.draw_grid()
+        self.modele.create_grid(size)
+        self.vue.main_widget.grid.draw_grid(self.modele.current_infos["grid"])
 
     def clear_grid(self):
         self.vue.main_widget.grid.clear_grid()
+        self.modele.current_infos["grid"].clear()
 
 if __name__ == "__main__":
 

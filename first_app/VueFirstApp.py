@@ -1,6 +1,6 @@
 import sys
 from PyQt6.QtWidgets import *
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal, QRect
 from PyQt6.QtGui import QIcon, QPixmap, QPainter
 from PyQt6.QtWidgets import QWidget
 
@@ -126,39 +126,35 @@ class MainWidget(QWidget):
         layout.addWidget(self.options)
         layout.addWidget(self.grid)
 
-class Grid(QWidget):
-    def __init__(self, width:int=0, height:int=0) -> None:
+class Grid(QLabel):
+    def __init__(self) -> None:
         super().__init__()
-
-        self.layout = QGridLayout() ; self.setLayout(self.layout)
-
         self.image = "../images/vide.png"
-        self.width = width
-        self.height = height
-
         self.grid = []
+        self.pixmap = QPixmap(self.image)
+        self.setPixmap(self.pixmap)
 
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        pixmap = QPixmap(self.image)
-        painter.drawPixmap(self.rect(), pixmap)
-        super().paintEvent(event)
+    def draw_grid(self, grid:list):
+        width = len(grid[0])
+        height = len(grid)
+        pixmap = self.pixmap
+        painter = QPainter(pixmap)
 
-    def draw_grid(self):
-        for i in range(self.height):
+        for i in range(height):
             row = []
-            for j in range(self.width):
-                case = QCheckBox()
+            for j in range(width):
+                case = QRect(i*30, j*30, 30, 30)
+                painter.drawRect(case)
                 row.append(case)
-                self.layout.addWidget(case, i, j)
             self.grid.append(row)
+        self.setPixmap(pixmap)
+        painter.end()
 
     def clear_grid(self):
-        for i in range(self.height-1, -1, -1):
-            for j in range(self.width-1, -1, -1):
-                self.layout.removeWidget(self.grid[i][j])
-                del self.grid[i][j]
         self.grid.clear()
+        self.pixmap = QPixmap(self.image)
+        self.setPixmap(self.pixmap)
+
 
 
 class Options(QWidget):
@@ -169,7 +165,7 @@ class Options(QWidget):
     def __init__(self) -> None:
         super().__init__()
 
-        self.setFixedWidth(int(QApplication.screens()[0].size().width()*0.3))
+        self.setFixedSize(int(QApplication.screens()[0].size().width()*0.3), int(QApplication.screens()[0].size().height()*0.3))
 
         layout = QVBoxLayout() ; self.setLayout(layout)
 

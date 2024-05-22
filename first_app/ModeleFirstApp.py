@@ -10,12 +10,9 @@ class ModeleFirstApp:
             "shop_name": "Sans nom",
             "shop_address": "Sans nom",
             "file_path": None,
-            "image": "../images/vide.png"
+            "image": "../images/vide.png",
+            "grid": []
         }
-
-        self.grid = []
-        self.grid_width = 0
-        self.grid_height = 0
 
 
     def save(self):
@@ -45,3 +42,14 @@ class ModeleFirstApp:
                with open(path, 'r') as f:
                 self.current_infos = json.load(f)
                 self.current_infos["file_path"] = path
+
+    def create_grid(self, size:tuple):
+        grille = []
+
+        for i in range(size[1]):
+            row = []
+            for j in range(size[0]):
+                row.append(1)
+            grille.append(row)
+
+        self.current_infos["grid"] = grille
