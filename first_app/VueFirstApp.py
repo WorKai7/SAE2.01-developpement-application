@@ -20,7 +20,7 @@ class VueFirstApp(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.resize(int(QApplication.screens()[0].size().width()), int(QApplication.screens()[0].size().height()))
+        self.resize(1600, 900)
         self.setWindowTitle("Projet sans nom")
 
         # Barre de menu et catégories
@@ -121,29 +121,92 @@ class MainWidget(QWidget):
         layout = QHBoxLayout() ; self.setLayout(layout)
 
         self.options = Options()
-        self.grid = Grid()
+        self.right = Right()
 
-        layout.addWidget(self.options)
-        layout.addWidget(self.grid)
+        layout.addWidget(self.options, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.right, alignment=Qt.AlignmentFlag.AlignCenter)
+
+
+class Right(QWidget):
+    def __init__(self) -> None:
+        super().__init__()
+
+        layout = QGridLayout() ; self.setLayout(layout)
+
+        self.grid = Grid()
+        self.w_slider = WidthSlider(self.grid.pixmap.width())
+        self.h_slider = HeightSlider(self.grid.pixmap.height())
+
+        layout.addWidget(self.w_slider, 0, 1)
+        layout.addWidget(self.h_slider, 1, 0)
+        layout.addWidget(self.grid, 1, 1)
+
+
+class WidthSlider(QSlider):
+
+    gridMoved = pyqtSignal(int)
+
+    def __init__(self, max_width:int):
+        super().__init__(Qt.Orientation.Horizontal)
+
+        self.setMaximum(max_width)
+        self.setProperty("type", "x")
+
+        self.valueChanged.connect(self.move_grid)
+
+
+    def move_grid(self, value:int):
+        self.gridMoved.emit(value)
+
+
+class HeightSlider(QSlider):
+
+    gridMoved = pyqtSignal(int)
+
+    def __init__(self, max_height:int):
+        super().__init__(Qt.Orientation.Vertical)
+
+        self.setMaximum(max_height)
+        self.setInvertedAppearance(True)
+        self.setProperty("type", "y")
+
+        self.valueChanged.connect(self.move_grid)
+
+
+    def move_grid(self, value:int):
+        self.gridMoved.emit(value)
+
 
 class Grid(QLabel):
     def __init__(self) -> None:
         super().__init__()
         self.image = "../images/vide.png"
         self.grid = []
+        self.x = 0
+        self.y = 0
+        self.update_image()
+        self.pixmap = QPixmap(self.image)
+
+    def update_image(self):
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap)
 
     def draw_grid(self, grid:list):
-        width = len(grid[0])
+        if grid:
+            width = len(grid[0])
+            case_size = grid[0][0]
+        else:
+            width = 0
+            case_size = 50
+
         height = len(grid)
         pixmap = self.pixmap
         painter = QPainter(pixmap)
 
-        for i in range(height):
+        for i in range(width):
             row = []
-            for j in range(width):
-                case = QRect(i*30, j*30, 30, 30)
+            for j in range(height):
+                case = QRect(i*case_size+self.x, j*case_size+self.y, case_size, case_size)
                 painter.drawRect(case)
                 row.append(case)
             self.grid.append(row)
@@ -152,8 +215,7 @@ class Grid(QLabel):
 
     def clear_grid(self):
         self.grid.clear()
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap)
+        self.update_image()
 
 
 
@@ -165,14 +227,16 @@ class Options(QWidget):
     def __init__(self) -> None:
         super().__init__()
 
-        self.setFixedSize(int(QApplication.screens()[0].size().width()*0.3), int(QApplication.screens()[0].size().height()*0.3))
-
         layout = QVBoxLayout() ; self.setLayout(layout)
 
         self.row_label = QLabel("Nombre de lignes")
         self.row_number = QSpinBox()
         self.column_label = QLabel("Nombre de colonnes")
         self.column_number = QSpinBox()
+        self.case_size_label = QLabel("Taille des cases")
+        self.case_size = QSpinBox()
+        self.case_size.setValue(50)
+        self.case_size.setSingleStep(10)
         self.draw_grid_button = QPushButton("Dessiner la grille")
         self.clear_grid_button = QPushButton("Effacer la grille")
 
@@ -180,6 +244,8 @@ class Options(QWidget):
         layout.addWidget(self.row_number, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.column_label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.column_number, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.case_size_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.case_size, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.draw_grid_button, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.clear_grid_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
@@ -188,7 +254,7 @@ class Options(QWidget):
 
 
     def dessinClicked(self):
-        self.drawClicked.emit((self.column_number.value(), self.row_number.value()))
+        self.drawClicked.emit((self.column_number.value(), self.row_number.value(), self.case_size.value()))
 
     def effaceClicked(self):
         self.clearClicked.emit()
