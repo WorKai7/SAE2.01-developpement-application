@@ -9,7 +9,7 @@ class ModeleFirstApp:
             "project_author": "Sans nom",
             "shop_name": "Sans nom",
             "shop_address": "Sans nom",
-            "file_path": None,
+            "file_path": "",
             "image": "../images/vide.png",
             "x": 0,
             "y": 0,

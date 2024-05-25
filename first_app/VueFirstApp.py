@@ -185,10 +185,18 @@ class Grid(QLabel):
         self.x = 0
         self.y = 0
         self.update_image()
-        self.pixmap = QPixmap(self.image)
 
     def update_image(self):
         self.pixmap = QPixmap(self.image)
+
+        if self.pixmap.width() >= 1100:
+            self.pixmap = QPixmap(self.image).scaledToWidth(1100)
+
+        if self.pixmap.height() >= 800:
+            self.pixmap = QPixmap(self.image).scaledToHeight(800)
+
+        self.blank_pixmap = self.pixmap
+
         self.setPixmap(self.pixmap)
 
     def draw_grid(self, grid:list):
@@ -200,7 +208,7 @@ class Grid(QLabel):
             case_size = 50
 
         height = len(grid)
-        pixmap = self.pixmap
+        pixmap = self.blank_pixmap.copy()
         painter = QPainter(pixmap)
 
         for i in range(width):
@@ -215,7 +223,7 @@ class Grid(QLabel):
 
     def clear_grid(self):
         self.grid.clear()
-        self.update_image()
+        self.setPixmap(self.blank_pixmap)
 
 
 
