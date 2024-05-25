@@ -33,13 +33,6 @@ class ModeleFirstApp:
             with open(path, 'w') as f:
                 json.dump(self.current_infos, f, indent=4)
 
-<<<<<<< HEAD
-
-    def open(self):
-        path = QFileDialog.getOpenFileName()[0]
-=======
->>>>>>> cc0c95424462d595a84d90308ae127bec39a4e48
-
     def open(self):
         path = QFileDialog.getOpenFileName(caption="Choisissez un projet", filter="Projet JSON (*.json)")[0]
         if path:
@@ -51,11 +44,10 @@ class ModeleFirstApp:
 
 
     def load_image(self):
-        image = QFileDialog.getOpenFileName()[0]
+        image = QFileDialog.getOpenFileName(caption="Sélectionner un plan", directory="../images", filter="Images (*.png *.jpg *.jpeg *.svg)")[0]
         if image:
-            if image[-4:] == ".png" or image[-4:] == ".jpg" or image[-4:] == ".svg" or image[-5:] == ".jpeg":
-                self.current_infos["image"] = image
-                return True
+            self.current_infos["image"] = image
+            return True
         return False
 
 

@@ -39,8 +39,8 @@ class Controller:
 
 
     def load(self):
-        self.modele.load_image()
-        self.update_vue()
+        if self.modele.load_image():
+            self.update_vue()
 
 
     def open(self):
