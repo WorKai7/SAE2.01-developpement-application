@@ -44,8 +44,8 @@ class Controller:
 
 
     def open(self):
-        self.modele.open()
-        self.update_vue()
+        if self.modele.open():
+            self.update_vue()
 
 
     def update_vue(self):

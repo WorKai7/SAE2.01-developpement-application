@@ -27,34 +27,27 @@ class ModeleFirstApp:
 
 
     def save_as(self):
-        path = QFileDialog.getSaveFileName()[0]
-
+        path = QFileDialog.getSaveFileName(caption="Enregistrer sous", directory="../projets", filter="Projet JSON")[0]
         if path:
-            if path[-5:] != ".json":
-                path += ".json"
-
             self.current_infos["file_path"] = path
-
             with open(path, 'w') as f:
                 json.dump(self.current_infos, f, indent=4)
 
-
     def open(self):
-        path = QFileDialog.getOpenFileName()[0]
-
+        path = QFileDialog.getOpenFileName(caption="Choisissez un projet", filter="Projet JSON (*.json)")[0]
         if path:
-            if path[-5:] == ".json":
-               with open(path, 'r') as f:
+            with open(path, 'r') as f:
                 self.current_infos = json.load(f)
                 self.current_infos["file_path"] = path
+            return True
+        return False
 
 
     def load_image(self):
-        image = QFileDialog.getOpenFileName()[0]
+        image = QFileDialog.getOpenFileName(caption="Sélectionner un plan", directory="../images", filter="Images (*.png *.jpg *.jpeg *.svg)")[0]
         if image:
-            if image[-4:] == ".png" or image[-4:] == ".jpg" or image[-4:] == ".svg" or image[-5:] == ".jpeg":
-                self.current_infos["image"] = image
-                return True
+            self.current_infos["image"] = image
+            return True
         return False
 
 
