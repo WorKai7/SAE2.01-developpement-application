@@ -18,7 +18,8 @@ class NewProjectApp(QWidget):
             "image": "../images/vide.png"
         }
 
-        self.resize(800, 500)
+        self.setMinimumSize(900, 600)
+        self.resize(900, 600)
         self.setWindowTitle("Nouveau projet")
 
         layout = QVBoxLayout() ; self.setLayout(layout)
@@ -33,7 +34,8 @@ class NewProjectApp(QWidget):
         self.shop_name = Champ("Ex: Monoprix")
         self.shop_address_label = QLabel("Adresse du magasin:")
         self.shop_address = Champ("Ex: 4894984 Rue de la paix, MontCul")
-        self.image_path = Champ("Chemin de l'image")
+        self.image_label = QLabel("Plan du magasin")
+        self.image_path = Champ("Sélectionnez une image")
         self.image_path.setDisabled(True)
         self.select_image_button = QPushButton("Parcourir")
         self.select_image_button.setFixedWidth(150)
@@ -57,6 +59,7 @@ class NewProjectApp(QWidget):
         layout.addWidget(self.shop_address_label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.shop_address, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addSpacing(30)
+        layout.addWidget(self.image_label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.image_path, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.select_image_button, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addSpacing(30)
@@ -74,14 +77,11 @@ class NewProjectApp(QWidget):
         self.infosSignal.emit(self.infos)
 
     def browse(self):
-        image = QFileDialog.getOpenFileName()[0]
+        image = QFileDialog.getOpenFileName(self, "Choisissez le plan", "", "Fichier PNG (*.png) ;; Fichier JPG (*.jpg *.jpeg) ;; Fichier SVG (*.svg)")[0]
 
         if image:
-            if image[-4:] == ".png" or image[-4:] == ".jpg" or image[-4:] == ".svg" or image[-5:] == ".jpeg":
-                self.infos["image"] = image
-                self.image_path.setText(image)
-            else:
-                print("Erreur d'extension de fichier d'image")
+            self.infos["image"] = image
+            self.image_path.setText(image)
         else:
             print("Pas de fichier sélectionné")
 
