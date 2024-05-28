@@ -25,6 +25,7 @@ class MainWidget(QWidget):
         self.setLayout(self.main_layout)
 
         self.menu_layout = QVBoxLayout()
+        self.menu_layout.addStretch()
         self.product_list_label = QLabel("Produit Destination")
         self.menu_layout.addWidget(self.product_list_label)
         self.product_list = QComboBox()
@@ -38,6 +39,7 @@ class MainWidget(QWidget):
         self.generate_path_button = QPushButton("Générer chemin")
         self.menu_layout.addWidget(self.generate_path_button)
         self.main_layout.addLayout(self.menu_layout)
+        self.menu_layout.addStretch()
 
         if not image_path is None:
             self.showPlan()
@@ -98,6 +100,6 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    fenetre = VueSecondApp()
+    fenetre = VueSecondApp("../images/vide.png")
 
     sys.exit(app.exec())
