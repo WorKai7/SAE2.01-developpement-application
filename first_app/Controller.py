@@ -60,6 +60,7 @@ class Controller:
         self.vue.main_widget.right.w_slider.setValue(self.modele.current_infos["x"])
         self.vue.main_widget.right.h_slider.setValue(self.modele.current_infos["y"])
 
+        self.vue.main_widget.right.grid.clear_grid()
         self.vue.main_widget.right.grid.draw_grid(self.modele.current_infos["grid"])
 
         self.vue.main_widget.options.row_number.setValue(len(self.modele.current_infos["grid"]))

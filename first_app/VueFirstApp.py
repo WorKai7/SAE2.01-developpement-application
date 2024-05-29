@@ -114,6 +114,14 @@ class VueFirstApp(QMainWindow):
         self.loadClicked.emit()
 
 
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            for i in range(len(self.main_widget.right.grid.grid)):
+                for j in range(len(self.main_widget.right.grid.grid[i])):
+                    if self.main_widget.right.grid.grid[i][j].x()+self.main_widget.right.x() < event.pos().x() and self.main_widget.right.grid.grid[i][j].x()+self.main_widget.right.grid.grid[i][j].width()+self.main_widget.right.x() > event.pos().x() and self.main_widget.right.grid.grid[i][j].y()+self.main_widget.right.y() < event.pos().y() and self.main_widget.right.grid.grid[i][j].y()+self.main_widget.right.grid.grid[i][j].height()+self.main_widget.right.y() > event.pos().y():
+                        print("Clic sur le rectangle (", i, j, ").")
+
+
 class MainWidget(QWidget):
     def __init__(self) -> None:
         super().__init__()
@@ -211,10 +219,10 @@ class Grid(QLabel):
         pixmap = self.blank_pixmap.copy()
         painter = QPainter(pixmap)
 
-        for i in range(width):
+        for i in range(height):
             row = []
-            for j in range(height):
-                case = QRect(i*case_size+self.x, j*case_size+self.y, case_size, case_size)
+            for j in range(width):
+                case = QRect(j*case_size+self.x, i*case_size+self.y, case_size, case_size)
                 painter.drawRect(case)
                 row.append(case)
             self.grid.append(row)
