@@ -114,13 +114,6 @@ class VueFirstApp(QMainWindow):
         self.loadClicked.emit()
 
 
-    def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            for i in range(len(self.main_widget.right.grid.grid)):
-                for j in range(len(self.main_widget.right.grid.grid[i])):
-                    if self.main_widget.right.grid.grid[i][j].x()+self.main_widget.right.x() < event.pos().x() and self.main_widget.right.grid.grid[i][j].x()+self.main_widget.right.grid.grid[i][j].width()+self.main_widget.right.x() > event.pos().x() and self.main_widget.right.grid.grid[i][j].y()+self.main_widget.right.y() < event.pos().y() and self.main_widget.right.grid.grid[i][j].y()+self.main_widget.right.grid.grid[i][j].height()+self.main_widget.right.y() > event.pos().y():
-                        print("Clic sur le rectangle (", i, j, ").")
-
 
 class MainWidget(QWidget):
     def __init__(self) -> None:
@@ -207,13 +200,11 @@ class Grid(QLabel):
 
         self.setPixmap(self.pixmap)
 
-    def draw_grid(self, grid:list):
+    def draw_grid(self, grid:list, case_size:int):
         if grid:
             width = len(grid[0])
-            case_size = grid[0][0]
         else:
             width = 0
-            case_size = 50
 
         height = len(grid)
         pixmap = self.blank_pixmap.copy()
@@ -232,6 +223,15 @@ class Grid(QLabel):
     def clear_grid(self):
         self.grid.clear()
         self.setPixmap(self.blank_pixmap)
+
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            for i in range(len(self.grid)):
+                for j in range(len(self.grid[i])):
+                    rect = self.grid[i][j]
+                    if rect.contains(event.pos()):
+                        print("Clic sur le rectangle (", i, j, ").")
 
 
 
