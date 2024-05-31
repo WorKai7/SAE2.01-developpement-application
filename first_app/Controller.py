@@ -10,14 +10,19 @@ class Controller:
         self.vue = VueFirstApp()
         self.modele = ModeleFirstApp()
         self.new_window = None
+        self.update_product_list()
 
         self.vue.newClicked.connect(self.new)
         self.vue.loadClicked.connect(self.load)
         self.vue.saveClicked.connect(self.modele.save)
         self.vue.saveasClicked.connect(self.modele.save_as)
         self.vue.openClicked.connect(self.open)
+        self.vue.main_widget.options.categoryChanged.connect(self.update_product_list)
         self.vue.main_widget.options.drawClicked.connect(self.draw_grid)
         self.vue.main_widget.options.clearClicked.connect(self.clear_grid)
+
+        self.vue.main_widget.options.products.addItem("bruh")
+        self.vue.main_widget.options.products.addItem("Poisson")
 
 
     def new(self):
@@ -45,6 +50,11 @@ class Controller:
         self.vue.main_widget.grid.image = self.modele.current_infos["image"]
         self.vue.main_widget.grid.update()
 
+    def update_product_list(self):
+        products = self.modele.get_products(self.vue.main_widget.options.category.currentText())
+        self.vue.main_widget.options.products.clear()
+        self.vue.main_widget.options.products.addItems(products)
+
     def draw_grid(self, size:tuple):
         if self.vue.main_widget.grid.grid:
             self.vue.main_widget.grid.clear_grid()
@@ -55,6 +65,7 @@ class Controller:
 
     def clear_grid(self):
         self.vue.main_widget.grid.clear_grid()
+
 
 if __name__ == "__main__":
 

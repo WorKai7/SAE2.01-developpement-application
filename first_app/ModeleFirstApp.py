@@ -1,6 +1,8 @@
 import json
 from PyQt6.QtWidgets import QFileDialog
 
+PRODUCTLIST = "../Liste de produits-20240513/liste_produits.json"
+
 class ModeleFirstApp:
 
     def __init__(self) -> None:
@@ -32,7 +34,6 @@ class ModeleFirstApp:
             with open(path, 'w') as f:
                 json.dump(self.current_infos, f, indent=4)
 
-
     def open(self):
         path = QFileDialog.getOpenFileName(caption="Choisissez un projet", filter="Projet JSON (*.json)")[0]
         if path:
@@ -41,3 +42,10 @@ class ModeleFirstApp:
                 self.current_infos["file_path"] = path
             return True
         return False
+    
+    def get_products(self, cat):
+        products = []
+        with open(PRODUCTLIST, encoding="utf-8") as f:
+            products = json.load(f)
+
+        return products.get(cat, [])

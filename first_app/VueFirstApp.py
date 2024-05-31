@@ -21,6 +21,7 @@ class VueFirstApp(QMainWindow):
         super().__init__()
 
         self.resize(int(QApplication.screens()[0].size().width()), int(QApplication.screens()[0].size().height()))
+        self.resize(720, 480)
         self.setWindowTitle("Projet sans nom")
 
         # Barre de menu et catégories
@@ -163,6 +164,7 @@ class Grid(QWidget):
 
 class Options(QWidget):
 
+    categoryChanged = pyqtSignal()
     drawClicked = pyqtSignal(tuple)
     clearClicked = pyqtSignal()
 
@@ -180,16 +182,29 @@ class Options(QWidget):
         self.draw_grid_button = QPushButton("Dessiner la grille")
         self.clear_grid_button = QPushButton("Effacer la grille")
 
+        self.category = QComboBox()
+        self.category.addItems(["Légumes", "Poissons", "Viandes", "Épicerie", "Épicerie sucrée", "Petit déjeuner", "Fruits", "Rayon frais", "Crèmerie", "Conserves", "Apéritifs", "Boissons", "Articles Maison", "Hygiène", "Bureau", "Animaux"])
+
+        self.category.currentTextChanged.connect(self.categorieChanged)
+
+        self.products = QListWidget()
+        self.products.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
+
+        self.draw_grid_button.clicked.connect(self.dessinClicked)
+        self.clear_grid_button.clicked.connect(self.effaceClicked)
+
         layout.addWidget(self.row_label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.row_number, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.column_label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.column_number, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.draw_grid_button, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.clear_grid_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.category, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.products, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.draw_grid_button.clicked.connect(self.dessinClicked)
-        self.clear_grid_button.clicked.connect(self.effaceClicked)
 
+    def categorieChanged(self):
+        self.categoryChanged.emit()
 
     def dessinClicked(self):
         self.drawClicked.emit((self.column_number.value(), self.row_number.value()))
