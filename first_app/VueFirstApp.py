@@ -114,6 +114,7 @@ class VueFirstApp(QMainWindow):
         self.loadClicked.emit()
 
 
+
 class MainWidget(QWidget):
     def __init__(self) -> None:
         super().__init__()
@@ -185,28 +186,34 @@ class Grid(QLabel):
         self.x = 0
         self.y = 0
         self.update_image()
-        self.pixmap = QPixmap(self.image)
 
     def update_image(self):
         self.pixmap = QPixmap(self.image)
+
+        if self.pixmap.width() >= 1100:
+            self.pixmap = QPixmap(self.image).scaledToWidth(1100)
+
+        if self.pixmap.height() >= 800:
+            self.pixmap = QPixmap(self.image).scaledToHeight(800)
+
+        self.blank_pixmap = self.pixmap
+
         self.setPixmap(self.pixmap)
 
-    def draw_grid(self, grid:list):
+    def draw_grid(self, grid:list, case_size:int):
         if grid:
             width = len(grid[0])
-            case_size = grid[0][0]
         else:
             width = 0
-            case_size = 50
 
         height = len(grid)
-        pixmap = self.pixmap
+        pixmap = self.blank_pixmap.copy()
         painter = QPainter(pixmap)
 
-        for i in range(width):
+        for i in range(height):
             row = []
-            for j in range(height):
-                case = QRect(i*case_size+self.x, j*case_size+self.y, case_size, case_size)
+            for j in range(width):
+                case = QRect(j*case_size+self.x, i*case_size+self.y, case_size, case_size)
                 painter.drawRect(case)
                 row.append(case)
             self.grid.append(row)
@@ -215,7 +222,16 @@ class Grid(QLabel):
 
     def clear_grid(self):
         self.grid.clear()
-        self.update_image()
+        self.setPixmap(self.blank_pixmap)
+
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            for i in range(len(self.grid)):
+                for j in range(len(self.grid[i])):
+                    rect = self.grid[i][j]
+                    if rect.contains(event.pos()):
+                        print("Clic sur le rectangle (", i, j, ").")
 
 
 

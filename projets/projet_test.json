@@ -3,8 +3,9 @@
     "project_author": "jerome",
     "shop_name": "leclerc",
     "shop_address": "dunkerque",
-    "file_path": "/media/jerome/A084-8111/Stockage/IUT/S2/SAE/SAE Application/first_app/test2.json",
+    "file_path": "/media/jerome/A084-8111/Stockage/IUT/S2/SAE/SAE Application/projets/projet_test.json",
     "image": "/media/jerome/A084-8111/Stockage/IUT/S2/SAE/SAE Application/images/plan1.jpg",
+    "case_size": 30,
     "x": 9,
     "y": 70,
     "grid": [
