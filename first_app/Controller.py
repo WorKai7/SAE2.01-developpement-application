@@ -63,16 +63,17 @@ class Controller:
         self.vue.main_widget.right.grid.clear_grid()
         self.vue.main_widget.right.grid.draw_grid(self.modele.current_infos["grid"], self.modele.current_infos["case_size"])
 
+        self.vue.main_widget.options.case_size.setValue(self.modele.current_infos["case_size"])
         self.vue.main_widget.options.row_number.setValue(len(self.modele.current_infos["grid"]))
         if self.modele.current_infos["grid"]:
             self.vue.main_widget.options.column_number.setValue(len(self.modele.current_infos["grid"][0]))
-            self.vue.main_widget.options.case_size.setValue(self.modele.current_infos["grid"][0][0])
 
 
     def draw_grid(self, size:tuple):
         self.clear_grid()
 
         self.modele.create_grid(size)
+        self.modele.current_infos["case_size"] = size[2]
         self.vue.main_widget.right.grid.draw_grid(self.modele.current_infos["grid"], self.modele.current_infos["case_size"])
 
 
