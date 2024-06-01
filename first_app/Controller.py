@@ -1,9 +1,9 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QFileDialog
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtWidgets import QApplication
 from VueFirstApp import VueFirstApp
 from ModeleFirstApp import ModeleFirstApp
 from NewProjectApp import NewProjectApp
+from Popup import Popup
 
 class Controller:
     def __init__(self) -> None:
@@ -12,6 +12,7 @@ class Controller:
         self.vue = VueFirstApp()
         self.modele = ModeleFirstApp()
         self.new_window = None
+        self.popup = None
 
         # Signaux
         self.vue.newClicked.connect(self.new)
@@ -23,6 +24,7 @@ class Controller:
         self.vue.main_widget.options.clearClicked.connect(self.clear_grid)
         self.vue.main_widget.right.w_slider.gridMoved.connect(self.move_grid)
         self.vue.main_widget.right.h_slider.gridMoved.connect(self.move_grid)
+        self.vue.main_widget.right.grid.rectClicked.connect(self.new_popup)
 
 
 
@@ -94,6 +96,12 @@ class Controller:
             self.modele.current_infos["y"] = value
 
         self.vue.main_widget.right.grid.draw_grid(self.modele.current_infos["grid"], self.modele.current_infos["case_size"])
+
+
+    def new_popup(self, coordinates:tuple):
+        self.popup = Popup(coordinates)
+
+
 
 if __name__ == "__main__":
 

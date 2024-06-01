@@ -179,6 +179,9 @@ class HeightSlider(QSlider):
 
 
 class Grid(QLabel):
+
+    rectClicked = pyqtSignal(tuple)
+
     def __init__(self) -> None:
         super().__init__()
         self.image = "../images/vide.png"
@@ -231,7 +234,7 @@ class Grid(QLabel):
                 for j in range(len(self.grid[i])):
                     rect = self.grid[i][j]
                     if rect.contains(event.pos()):
-                        print("Clic sur le rectangle (", i, j, ").")
+                        self.rectClicked.emit((i, j))
 
 
 
