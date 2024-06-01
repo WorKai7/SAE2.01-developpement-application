@@ -1,8 +1,11 @@
 import sys
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QComboBox, QListWidget, QAbstractItemView, QApplication
+import json
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QComboBox, QListWidget, QAbstractItemView, QApplication, QLabel
+from PyQt6.QtGui import QPixmap, QPainter
+from PyQt6.QtCore import QRect, Qt
 
 class Popup(QWidget):
-    def __init__(self, coordinates:tuple):
+    def __init__(self, coordinates:tuple, max_right:int, max_bottom:int):
         super().__init__()
         
         self.setWindowTitle("Case (" + str(coordinates[0]) + ", " + str(coordinates[1]) + ")")
@@ -10,10 +13,10 @@ class Popup(QWidget):
         layout = QHBoxLayout() ; self.setLayout(layout)
 
         self.left = Left()
+        self.right = Right(coordinates, max_right, max_bottom)
 
         layout.addWidget(self.left)
-
-        self.show()
+        layout.addWidget(self.right)
 
 
 class Left(QWidget):
@@ -27,6 +30,7 @@ class Left(QWidget):
 
         self.products = QListWidget()
         self.products.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.update_product_list()
 
         self.category.currentTextChanged.connect(self.update_product_list)
 
@@ -39,11 +43,47 @@ class Left(QWidget):
         self.products.addItems(products)
 
     def get_products(self, category:str):
-        pass
+        products = []
+        with open("../Liste de produits-20240513/liste_produits.json", encoding="utf-8") as f:
+            products = json.load(f)
+
+        return products.get(category, [])
+
+
+class Right(QLabel):
+    def __init__(self, coordinates:tuple, max_right:int, max_bottom:int):
+        super().__init__()
+
+        self.schema = QPixmap(400, 400)
+        self.schema.fill(Qt.GlobalColor.transparent)
+        self.rect_list = []
+
+        painter = QPainter(self.schema)
+        if coordinates[0] > 0:
+            self.rect_list.append(QRect(150, 50, 100, 100))
+
+        if coordinates[1] > 0:
+            self.rect_list.append(QRect(50, 150, 100, 100))
+
+        self.rect_list.append(QRect(150, 150, 100, 100))
+
+        if coordinates[1] < max_right-1:
+            self.rect_list.append(QRect(250, 150, 100, 100))
+
+        if coordinates[0] < max_bottom-1:
+            self.rect_list.append(QRect(150, 250, 100, 100))
+
+        painter.drawRects(self.rect_list)
+
+        self.setPixmap(self.schema)
+
+        painter.end()
+
 
 
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     fenetre = Popup((24, 625))
+    fenetre.show()
     sys.exit(app.exec())

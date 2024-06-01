@@ -99,7 +99,12 @@ class Controller:
 
 
     def new_popup(self, coordinates:tuple):
-        self.popup = Popup(coordinates)
+        max_bottom = len(self.modele.current_infos["grid"])
+        if self.modele.current_infos["grid"]:
+            max_right = len(self.modele.current_infos["grid"][0])
+
+        self.popup = Popup(coordinates, max_right, max_bottom)
+        self.popup.show()
 
 
 

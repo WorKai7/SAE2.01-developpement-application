@@ -35,7 +35,7 @@ class ModeleFirstApp:
                 json.dump(self.current_infos, f, indent=4)
 
     def open(self):
-        path = QFileDialog.getOpenFileName(caption="Choisissez un projet", filter="Projet JSON (*.json)")[0]
+        path = QFileDialog.getOpenFileName(caption="Choisissez un projet", directory="../projets", filter="Projet JSON (*.json)")[0]
         if path:
             with open(path, 'r') as f:
                 self.current_infos = json.load(f)
