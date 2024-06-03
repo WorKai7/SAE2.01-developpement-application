@@ -14,7 +14,8 @@ class ModeleFirstApp:
             "case_size": 50,
             "x": 0,
             "y": 0,
-            "grid": []
+            "grid": [],
+            "pattern": {}
         }
 
 
@@ -24,7 +25,9 @@ class ModeleFirstApp:
             self.save_as()
         else:
             with open(self.current_infos["file_path"], 'w') as f:
+                self.convert_tuples_to_str()
                 json.dump(self.current_infos, f, indent=4)
+                self.convert_str_to_tuples()
 
 
     def save_as(self):
@@ -32,13 +35,16 @@ class ModeleFirstApp:
         if path:
             self.current_infos["file_path"] = path
             with open(path, 'w') as f:
+                self.convert_tuples_to_str()
                 json.dump(self.current_infos, f, indent=4)
+                self.convert_str_to_tuples()
 
     def open(self):
         path = QFileDialog.getOpenFileName(caption="Choisissez un projet", directory="../projets", filter="Projet JSON (*.json)")[0]
         if path:
             with open(path, 'r') as f:
                 self.current_infos = json.load(f)
+                self.convert_str_to_tuples()
                 self.current_infos["file_path"] = path
             return True
         return False
@@ -54,11 +60,69 @@ class ModeleFirstApp:
 
     def create_grid(self, size:tuple):
         grille = []
+        pattern = {}
 
         for i in range(size[1]):
             row = []
             for j in range(size[0]):
-                row.append(size[2])
+                row.append(None)
+                sommet = (i, j)
+                pattern[sommet] = {}
+
+                if i > 0:
+                    pattern[sommet][(i-1, j)] = 1
+                if i < size[1]-1:
+                    pattern[sommet][(i+1, j)] = 1
+                if j > 0:
+                    pattern[sommet][(i, j-1)] = 1
+                if j < size[0]-1:
+                    pattern[sommet][(i, j+1)] = 1
+
             grille.append(row)
 
         self.current_infos["grid"] = grille
+        self.current_infos["pattern"] = pattern
+
+    def convert_tuples_to_str(self):
+        converted_pattern = {}
+
+        for key, value in self.current_infos["pattern"].items():
+            converted_pattern[str(key)] = {}
+            for key2, value2 in value.items():
+                converted_pattern[str(key)][str(key2)] = value2
+
+        self.current_infos["pattern"] = converted_pattern
+
+    def convert_str_to_tuples(self):
+        converted_pattern = {}
+
+        for key, value in self.current_infos["pattern"].items():
+            first_value = ""
+            i = 1
+            while key[i] != ",":
+                first_value += key[i]
+                i += 1
+
+            second_value = ""
+            i = -2
+            while key[i] != " ":
+                second_value += key[i]
+                i -= 1
+
+            converted_pattern[(int(first_value), int(second_value))] = {}
+            for key2, value2 in value.items():
+                first_value2 = ""
+                i = 1
+                while key2[i] != ",":
+                    first_value2 += key2[i]
+                    i += 1
+
+                second_value2 = ""
+                i = -2
+                while key2[i] != " ":
+                    second_value2 += key2[i]
+                    i -= 1
+
+                converted_pattern[(int(first_value), int(second_value))][(int(first_value2), int(second_value2))] = value2
+
+        self.current_infos["pattern"] = converted_pattern
