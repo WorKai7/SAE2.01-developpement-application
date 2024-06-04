@@ -4,17 +4,16 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QToolBar, QStatusBar, \
                             QHBoxLayout, QComboBox, QWidget, QPushButton
 from PyQt6.QtGui import QIcon, QAction, QPixmap
 from PyQt6.QtCore import Qt, pyqtSignal
-from pathlib import Path
 
 class ProjectInfos(QWidget):
     def __init__(self, infos: dict):
         super().__init__()
         self.projectInfos = infos
 
-        self.author = QLabel(self.projectInfos['project_author'])
-        self.project_name = QLabel(self.projectInfos["project_name"])
-        self.shop_name = QLabel("shop_name")
-        self.shop_address = QLabel(self.projectInfos["shop_address"])
+        self.author = QLabel("Auteur : " + self.projectInfos['project_author'])
+        self.project_name = QLabel("Nom du Plan : " + self.projectInfos["project_name"])
+        self.shop_name = QLabel("Nom du magasin : " + self.projectInfos["shop_name"])
+        self.shop_address = QLabel("Adresse : " + self.projectInfos["shop_address"])
 
         self.main_layout = QVBoxLayout()
         self.setLayout(self.main_layout)
@@ -112,12 +111,16 @@ class MainWidget(QWidget):
     def generatePath(self):
         self.generatePathClicked.emit()
 
+    def showPaths(self, path_list: list):
+        for path in path_list:
+            self.showPathToDestination(path)
+
     def showPathToDestination(self, path: list):
         pass
 
 class VueSecondApp(QMainWindow):
 
-    loadClicked = pyqtSignal(str)
+    loadClicked = pyqtSignal()
     infosClicked = pyqtSignal()
 
     def __init__(self, chemin: str = None):
@@ -129,7 +132,7 @@ class VueSecondApp(QMainWindow):
         menu_fichier = menu_bar.addMenu('&Fichier')
         menu_nav = menu_bar.addMenu('&Navigation')
 
-        menu_fichier.addAction('Ouvrir Plan', self.setProject)
+        menu_fichier.addAction('Ouvrir Plan', self.loadProject)
         menu_fichier.addAction('Infos Plan', self.viewInfos)
         menu_fichier.addSeparator()
         menu_fichier.addAction('Quitter', self.destroy)
@@ -160,10 +163,6 @@ class VueSecondApp(QMainWindow):
         self.mainWidget.main_layout.removeWidget(self.mainWidget.image)
         self.mainWidget.showPlan(image_path)
 
-    def setProject(self):
-        filepath = QFileDialog.getOpenFileName(self, 'Ouvrir plan', str(Path.cwd()), "Json Files (*.json)")
-        self.loadClicked.emit(filepath[0])
-
     def viewInfos(self):
         self.infosClicked.emit()
 
@@ -171,6 +170,9 @@ class VueSecondApp(QMainWindow):
         self.project_infos = infos
         self.__imagePath = self.project_infos["image"]
         self.updatePlan(self.__imagePath)
+
+    def loadProject(self):
+        self.loadClicked.emit()
 
 
 ## -----------------------------------------------------------------------------

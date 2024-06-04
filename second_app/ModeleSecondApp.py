@@ -17,7 +17,7 @@ class ModeleSecondApp:
             "grid": []
         }
         self.current_position = [0, 0]
-        self.destination = []
+        self.destinations = []
     
     def open(self):
         path = QFileDialog.getOpenFileName(caption="Choisissez un projet", filter="Json Files (*.json)")[0]
@@ -28,22 +28,36 @@ class ModeleSecondApp:
             return True
         return False
 
-    def getProductList(self):
+    def getProductList(self) -> list:
         pass
 
-    def generatePathToDestination(self):
+    def generateFullPath(self, start, product_list: list) ->list:
+        full_path = []
+        while len(product_list) != 0:
+            min_path = self.generatePathToDestination(start, product_list[0])
+            min_path_len = len(min_path)
+            product_to_remove = product_list[0]
+            for product in product_list:
+                path = self.generatePathToDestination(start, product)
+                path_len = len(path)
+                if len(path) < min_path_len:
+                    min_path = path
+                    min_path_len = path_len
+                    product_to_remove = product
+            full_path.append(path)
+            product_list.remove(product_to_remove)
+            start = product_to_remove
+        return full_path
+
+    def generatePathToDestination(self, start, end) -> list:
         pass
 
-    def setPosition(self, random: bool, position: list):
-        if random:
+    def setPosition(self, randomness: bool, position: list):
+        if randomness:
             self.current_position = [random.randint(0, len(self.current_infos['grid'][0])- 1), random.randint(0, len(self.current_infos['grid'][1])- 1)]
         else:
             self.current_position = position
 
-    def setDestination(self, destination: list):
-        pass
-
-    def loadProject(self, path: str):
-        with open(path, 'r') as f:
-            self.current_infos = json.load(f)
+    def addDestination(self, destination: list):
+        self.destinations.append(destination)
 
