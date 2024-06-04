@@ -109,6 +109,8 @@ class ModeleFirstApp:
                 second_value += key[i]
                 i -= 1
 
+            second_value = second_value[::-1]
+
             converted_pattern[(int(first_value), int(second_value))] = {}
             for key2, value2 in value.items():
                 first_value2 = ""
@@ -122,6 +124,8 @@ class ModeleFirstApp:
                 while key2[i] != " ":
                     second_value2 += key2[i]
                     i -= 1
+
+                second_value2 = second_value2[::-1]
 
                 converted_pattern[(int(first_value), int(second_value))][(int(first_value2), int(second_value2))] = value2
 

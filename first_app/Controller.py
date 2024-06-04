@@ -99,12 +99,17 @@ class Controller:
 
 
     def new_popup(self, coordinates:tuple):
-        max_bottom = len(self.modele.current_infos["grid"])
-        if self.modele.current_infos["grid"]:
-            max_right = len(self.modele.current_infos["grid"][0])
+        if self.popup:
+            self.popup.close()
 
-        self.popup = Popup(coordinates, max_right, max_bottom)
+        self.popup = Popup(coordinates, self.modele.current_infos["pattern"])
         self.popup.show()
+
+        self.popup.confirmClicked.connect(self.update_pattern)
+
+    def update_pattern(self):
+        print("On a fermé la fenêtre:\nRectangles: ", self.popup.right.rect_infos, "\nArticle ajouté: ", self.popup.left.products.currentItem().text())
+        self.popup.close()
 
 
 

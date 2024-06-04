@@ -1,11 +1,14 @@
 import sys
 import json
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QComboBox, QListWidget, QAbstractItemView, QApplication, QLabel, QPushButton
-from PyQt6.QtGui import QMouseEvent, QPixmap, QPainter
-from PyQt6.QtCore import QRect, Qt
+from PyQt6.QtGui import QMouseEvent, QPixmap, QPainter, QBrush, QColor
+from PyQt6.QtCore import QRect, Qt, pyqtSignal
 
 class Popup(QWidget):
-    def __init__(self, coordinates:tuple, max_right:int, max_bottom:int):
+
+    confirmClicked = pyqtSignal()
+
+    def __init__(self, coordinates:tuple, pattern:dict):
         super().__init__()
         
         self.setWindowTitle("Case (" + str(coordinates[0]) + ", " + str(coordinates[1]) + ")")
@@ -16,7 +19,7 @@ class Popup(QWidget):
 
         self.info = QLabel("⬇️ Sélectionnez l'article à placer dans la case et définissez les murs ⬇️")
         self.left = Left()
-        self.right = Right(coordinates, max_right, max_bottom)
+        self.right = Right(coordinates, pattern)
         self.ajout = QLabel("Article ajouté : Aucun")
         self.confirm_button = QPushButton("Confirmer")
         self.confirm_button.setFixedWidth(350)
@@ -31,10 +34,18 @@ class Popup(QWidget):
         main_layout.addSpacing(10)
 
         self.left.products.currentItemChanged.connect(self.update_label)
+        self.confirm_button.clicked.connect(self.confirm)
 
 
     def update_label(self):
         self.ajout.setText("Article ajouté : " + self.left.products.currentItem().text())
+
+    def confirm(self):
+        self.confirmClicked.emit()
+
+    def closeEvent(self, event):
+        self.right.painter.end()
+        self.close()
 
 
 class Left(QWidget):
@@ -69,50 +80,55 @@ class Left(QWidget):
 
 
 class Right(QLabel):
-    def __init__(self, coordinates:tuple, max_right:int, max_bottom:int):
+    def __init__(self, coordinates:tuple, pattern:dict):
         super().__init__()
 
         self.schema = QPixmap(400, 400)
         self.schema.fill(Qt.GlobalColor.transparent)
         self.rect_list = []
-        self.rect_names = []
+        self.rect_infos = []
+        max_right = max([key[1] for key in pattern.keys()])
+        max_bottom = max([key[0] for key in pattern.keys()])
 
-        painter = QPainter(self.schema)
+        self.painter = QPainter(self.schema)
         if coordinates[0] > 0:
             self.rect_list.append(QRect(150, 50, 100, 100))
-            self.rect_names.append("up")
+            self.rect_infos.append(["up", "green"])
 
         if coordinates[1] > 0:
             self.rect_list.append(QRect(50, 150, 100, 100))
-            self.rect_names.append("left")
+            self.rect_infos.append(["left", "green"])
 
-        self.rect_list.append(QRect(150, 150, 100, 100))
-        self.rect_names.append("current")
+        mid_rect = QRect(150, 150, 100, 100)
+        self.rect_list.append(mid_rect)
+        self.rect_infos.append(["current", "black"])
 
         if coordinates[1] < max_right-1:
             self.rect_list.append(QRect(250, 150, 100, 100))
-            self.rect_names.append("right")
+            self.rect_infos.append(["right", "green"])
 
         if coordinates[0] < max_bottom-1:
             self.rect_list.append(QRect(150, 250, 100, 100))
-            self.rect_names.append("down")
+            self.rect_infos.append(["down", "green"])
 
-        painter.drawRects(self.rect_list)
+        self.painter.setBrush(QBrush(QColor(Qt.GlobalColor.green)))
+        self.painter.drawRects(self.rect_list)
+
+        self.painter.setBrush(QBrush(QColor(Qt.GlobalColor.black)))
+        self.painter.drawRect(mid_rect)
 
         self.setPixmap(self.schema)
-
-        painter.end()
 
 
     def mousePressEvent(self, event):
         for i in range(len(self.rect_list)):
             if self.rect_list[i].contains(event.pos()):
-                print("clic dans ", self.rect_names[i])
-
-
-if __name__ == "__main__":
-
-    app = QApplication(sys.argv)
-    fenetre = Popup((24, 625), 24, 625)
-    fenetre.show()
-    sys.exit(app.exec())
+                if self.rect_infos[i][1] == "green":
+                    self.painter.setBrush(QColor(Qt.GlobalColor.red))
+                    self.painter.drawRect(self.rect_list[i])
+                    self.rect_infos[i][1] = "red"
+                elif self.rect_infos[i][1] == "red":
+                    self.painter.setBrush(QColor(Qt.GlobalColor.green))
+                    self.painter.drawRect(self.rect_list[i])
+                    self.rect_infos[i][1] = "green"
+                self.setPixmap(self.schema)
