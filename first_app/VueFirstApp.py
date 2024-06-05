@@ -1,7 +1,7 @@
 import sys
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import Qt, pyqtSignal, QRect
-from PyQt6.QtGui import QIcon, QPixmap, QPainter
+from PyQt6.QtGui import QColor, QPixmap, QPainter, QFont
 from PyQt6.QtWidgets import QWidget
 
 
@@ -217,8 +217,13 @@ class Grid(QLabel):
             row = []
             for j in range(width):
                 case = QRect(j*case_size+self.x, i*case_size+self.y, case_size, case_size)
-                painter.drawRect(case)
                 row.append(case)
+                if grid[i][j]:
+                    painter.setBrush(QColor(0, 0, 0, 128))
+                    painter.drawRect(case)
+                    painter.setBrush(QColor(0, 0, 0, 0))
+                else:
+                    painter.drawRect(case)
             self.grid.append(row)
         self.setPixmap(pixmap)
         painter.end()
@@ -248,24 +253,44 @@ class Options(QWidget):
 
         layout = QVBoxLayout() ; self.setLayout(layout)
 
+        font18 = QFont()
+        font18.setPointSize(18)
+
         self.row_label = QLabel("Nombre de lignes")
+        self.row_label.setFont(font18)
         self.row_number = QSpinBox()
+        self.row_number.setFont(font18)
+        self.row_number.setFixedWidth(200)
         self.column_label = QLabel("Nombre de colonnes")
+        self.column_label.setFont(font18)
         self.column_number = QSpinBox()
+        self.column_number.setFont(font18)
+        self.column_number.setFixedWidth(200)
         self.case_size_label = QLabel("Taille des cases")
+        self.case_size_label.setFont(font18)
         self.case_size = QSpinBox()
+        self.case_size.setFont(font18)
+        self.case_size.setFixedWidth(200)
         self.case_size.setValue(50)
         self.case_size.setSingleStep(10)
         self.draw_grid_button = QPushButton("Dessiner la grille")
+        self.draw_grid_button.setFixedSize(200, 50)
+        self.draw_grid_button.setFont(font18)
         self.clear_grid_button = QPushButton("Effacer la grille")
+        self.clear_grid_button.setFixedSize(200, 50)
+        self.clear_grid_button.setFont(font18)
 
         layout.addWidget(self.row_label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.row_number, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addSpacing(25)
         layout.addWidget(self.column_label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.column_number, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addSpacing(25)
         layout.addWidget(self.case_size_label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.case_size, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addSpacing(30)
         layout.addWidget(self.draw_grid_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addSpacing(10)
         layout.addWidget(self.clear_grid_button, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.draw_grid_button.clicked.connect(self.dessinClicked)

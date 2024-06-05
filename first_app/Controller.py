@@ -102,14 +102,57 @@ class Controller:
         if self.popup:
             self.popup.close()
 
-        self.popup = Popup(coordinates, self.modele.current_infos["pattern"])
+        self.popup = Popup(coordinates, self.modele.current_infos["pattern"], self.modele.current_infos["grid"][coordinates[0]][coordinates[1]])
         self.popup.show()
 
         self.popup.confirmClicked.connect(self.update_pattern)
 
     def update_pattern(self):
-        print("On a fermé la fenêtre:\nRectangles: ", self.popup.right.rect_infos, "\nArticle ajouté: ", self.popup.left.products.currentItem().text())
+        if self.popup.x < len(self.modele.current_infos["grid"][0]) and self.popup.y < len(self.modele.current_infos["grid"]):
+            if self.popup.left.products.currentItem():
+                self.modele.current_infos["grid"][self.popup.y][self.popup.x] = [self.popup.left.categories.currentText(), self.popup.left.products.currentItem().text()]
+            else:
+                self.modele.current_infos["grid"][self.popup.y][self.popup.x] = None
+
+            for info in self.popup.right.rect_infos:
+                if info[1] == "green":
+                    if info[0] == "left":
+                        self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)][(self.popup.y, self.popup.x-1)] = 1
+                        self.modele.current_infos["pattern"][(self.popup.y, self.popup.x-1)][(self.popup.y, self.popup.x)] = 1
+                    if info[0] == "right":
+                        self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)][(self.popup.y, self.popup.x+1)] = 1
+                        self.modele.current_infos["pattern"][(self.popup.y, self.popup.x+1)][(self.popup.y, self.popup.x)] = 1
+                    if info[0] == "down":
+                        self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)][(self.popup.y+1, self.popup.x)] = 1
+                        self.modele.current_infos["pattern"][(self.popup.y+1, self.popup.x)][(self.popup.y, self.popup.x)] = 1
+                    if info[0] == "up":
+                        self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)][(self.popup.y-1, self.popup.x)] = 1
+                        self.modele.current_infos["pattern"][(self.popup.y-1, self.popup.x)][(self.popup.y, self.popup.x)] = 1
+                elif info[1] == "red":
+                    if info[0] == "left":
+                        if (self.popup.y, self.popup.x-1) in self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)].keys():
+                            del self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)][(self.popup.y, self.popup.x-1)]
+                        if (self.popup.y, self.popup.x) in self.modele.current_infos["pattern"][(self.popup.y, self.popup.x-1)].keys():
+                            del self.modele.current_infos["pattern"][(self.popup.y, self.popup.x-1)][(self.popup.y, self.popup.x)]
+                    if info[0] == "right":
+                        if (self.popup.y, self.popup.x+1) in self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)].keys():
+                            del self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)][(self.popup.y, self.popup.x+1)]
+                        if (self.popup.y, self.popup.x) in self.modele.current_infos["pattern"][(self.popup.y, self.popup.x+1)].keys():
+                            del self.modele.current_infos["pattern"][(self.popup.y, self.popup.x+1)][(self.popup.y, self.popup.x)]
+                    if info[0] == "down":
+                        if (self.popup.y+1, self.popup.x) in self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)].keys():
+                            del self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)][(self.popup.y+1, self.popup.x)]
+                        if (self.popup.y, self.popup.x) in self.modele.current_infos["pattern"][(self.popup.y+1, self.popup.x)].keys():
+                            del self.modele.current_infos["pattern"][(self.popup.y+1, self.popup.x)][(self.popup.y, self.popup.x)]
+                    if info[0] == "up":
+                        if (self.popup.y-1, self.popup.x) in self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)].keys():
+                            del self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)][(self.popup.y-1, self.popup.x)]
+                        if (self.popup.y, self.popup.x) in self.modele.current_infos["pattern"][(self.popup.y-1, self.popup.x)].keys():
+                            del self.modele.current_infos["pattern"][(self.popup.y-1, self.popup.x)][(self.popup.y, self.popup.x)]
+
+
         self.popup.close()
+        self.update_vue()
 
 
 

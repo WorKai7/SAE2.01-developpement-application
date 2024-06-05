@@ -24,7 +24,7 @@ class ModeleFirstApp:
         if not self.current_infos["file_path"]:
             self.save_as()
         else:
-            with open(self.current_infos["file_path"], 'w') as f:
+            with open(self.current_infos["file_path"], 'w', encoding="utf8") as f:
                 self.convert_tuples_to_str()
                 json.dump(self.current_infos, f, indent=4)
                 self.convert_str_to_tuples()
@@ -34,7 +34,7 @@ class ModeleFirstApp:
         path = QFileDialog.getSaveFileName(caption="Enregistrer sous", directory="../projets", filter="Projet JSON")[0]
         if path:
             self.current_infos["file_path"] = path
-            with open(path, 'w') as f:
+            with open(path, 'w', encoding="utf8") as f:
                 self.convert_tuples_to_str()
                 json.dump(self.current_infos, f, indent=4)
                 self.convert_str_to_tuples()
@@ -42,7 +42,7 @@ class ModeleFirstApp:
     def open(self):
         path = QFileDialog.getOpenFileName(caption="Choisissez un projet", directory="../projets", filter="Projet JSON (*.json)")[0]
         if path:
-            with open(path, 'r') as f:
+            with open(path, 'r', encoding="utf8") as f:
                 self.current_infos = json.load(f)
                 self.convert_str_to_tuples()
                 self.current_infos["file_path"] = path

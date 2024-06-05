@@ -8,19 +8,43 @@ class Popup(QWidget):
 
     confirmClicked = pyqtSignal()
 
-    def __init__(self, coordinates:tuple, pattern:dict):
+    def __init__(self, coordinates:tuple, pattern:dict, product_infos:list|None):
         super().__init__()
         
-        self.setWindowTitle("Case (" + str(coordinates[0]) + ", " + str(coordinates[1]) + ")")
+        self.x = coordinates[1]
+        self.y = coordinates[0]
+
+        if product_infos:
+            self.category = product_infos[0]
+            self.product = product_infos[1]
+        else:
+            self.category = None
+            self.product = None
+
+        self.setWindowTitle("Case (" + str(self.y) + ", " + str(self.x) + ")")
         
         layout = QHBoxLayout()
         main_layout = QVBoxLayout()
         self.setLayout(main_layout)
 
         self.info = QLabel("⬇️ Sélectionnez l'article à placer dans la case et définissez les murs ⬇️")
-        self.left = Left()
         self.right = Right(coordinates, pattern)
-        self.ajout = QLabel("Article ajouté : Aucun")
+        self.left = Left()
+
+        if self.category:
+            self.left.categories.setCurrentText(self.category)
+
+        if self.product:
+            self.ajout = QLabel("Article : " + self.product)
+            item = self.left.products.findItems(self.product, Qt.MatchFlag.MatchExactly)
+            self.left.products.setCurrentItem(item[0])
+        else:
+            self.ajout = QLabel("Article : Aucun")
+
+
+        self.delete_button = QPushButton("Supprimer l'article")
+        self.delete_button.setFixedWidth(350)
+
         self.confirm_button = QPushButton("Confirmer")
         self.confirm_button.setFixedWidth(350)
 
@@ -30,18 +54,27 @@ class Popup(QWidget):
         main_layout.addLayout(layout)
         main_layout.addSpacing(10)
         main_layout.addWidget(self.ajout, alignment=Qt.AlignmentFlag.AlignCenter)
+        main_layout.addWidget(self.delete_button, alignment=Qt.AlignmentFlag.AlignCenter)
+        main_layout.addSpacing(10)
         main_layout.addWidget(self.confirm_button, alignment=Qt.AlignmentFlag.AlignCenter)
         main_layout.addSpacing(10)
 
         self.left.products.currentItemChanged.connect(self.update_label)
         self.confirm_button.clicked.connect(self.confirm)
+        self.delete_button.clicked.connect(self.delete)
 
 
     def update_label(self):
-        self.ajout.setText("Article ajouté : " + self.left.products.currentItem().text())
+        if self.left.products.currentItem():
+            self.ajout.setText("Article : " + self.left.products.currentItem().text())
+        else:
+            self.ajout.setText("Article: Aucun")
 
     def confirm(self):
         self.confirmClicked.emit()
+
+    def delete(self):
+        self.left.products.setCurrentItem(None)
 
     def closeEvent(self, event):
         self.right.painter.end()
@@ -54,20 +87,20 @@ class Left(QWidget):
 
         layout = QVBoxLayout() ; self.setLayout(layout)
 
-        self.category = QComboBox()
-        self.category.addItems(["Légumes", "Poissons", "Viandes", "Épicerie", "Épicerie sucrée", "Petit déjeuner", "Fruits", "Rayon frais", "Crèmerie", "Conserves", "Apéritifs", "Boissons", "Articles Maison", "Hygiène", "Bureau", "Animaux"])
+        self.categories = QComboBox()
+        self.categories.addItems(["Légumes", "Poissons", "Viandes", "Épicerie", "Épicerie sucrée", "Petit déjeuner", "Fruits", "Rayon frais", "Crèmerie", "Conserves", "Apéritifs", "Boissons", "Articles Maison", "Hygiène", "Bureau", "Animaux"])
 
         self.products = QListWidget()
         self.products.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.update_product_list()
 
-        self.category.currentTextChanged.connect(self.update_product_list)
+        self.categories.currentTextChanged.connect(self.update_product_list)
 
-        layout.addWidget(self.category)
+        layout.addWidget(self.categories)
         layout.addWidget(self.products)
 
     def update_product_list(self):
-        products = self.get_products(self.category.currentText())
+        products = self.get_products(self.categories.currentText())
         self.products.clear()
         self.products.addItems(products)
 
@@ -92,27 +125,60 @@ class Right(QLabel):
 
         self.painter = QPainter(self.schema)
         if coordinates[0] > 0:
-            self.rect_list.append(QRect(150, 50, 100, 100))
-            self.rect_infos.append(["up", "green"])
+            rect = QRect(150, 50, 100, 100)
+            self.rect_list.append(rect)
+
+            if (coordinates[0]-1, coordinates[1]) in pattern[(coordinates[0], coordinates[1])].keys():
+                self.rect_infos.append(["up", "green"])
+                self.painter.setBrush(QBrush(QColor(Qt.GlobalColor.green)))
+            else:
+                self.rect_infos.append(["up", "red"])
+                self.painter.setBrush(QBrush(QColor(Qt.GlobalColor.red)))
+
+            self.painter.drawRect(rect)
 
         if coordinates[1] > 0:
-            self.rect_list.append(QRect(50, 150, 100, 100))
-            self.rect_infos.append(["left", "green"])
+            rect = QRect(50, 150, 100, 100)
+            self.rect_list.append(rect)
+
+            if (coordinates[0], coordinates[1]-1) in pattern[(coordinates[0], coordinates[1])].keys():
+                self.rect_infos.append(["left", "green"])
+                self.painter.setBrush(QBrush(QColor(Qt.GlobalColor.green)))
+            else:
+                self.rect_infos.append(["left", "red"])
+                self.painter.setBrush(QBrush(QColor(Qt.GlobalColor.red)))
+
+            self.painter.drawRect(rect)
 
         mid_rect = QRect(150, 150, 100, 100)
         self.rect_list.append(mid_rect)
         self.rect_infos.append(["current", "black"])
 
-        if coordinates[1] < max_right-1:
-            self.rect_list.append(QRect(250, 150, 100, 100))
-            self.rect_infos.append(["right", "green"])
+        if coordinates[1] < max_right:
+            rect = QRect(250, 150, 100, 100)
+            self.rect_list.append(rect)
 
-        if coordinates[0] < max_bottom-1:
-            self.rect_list.append(QRect(150, 250, 100, 100))
-            self.rect_infos.append(["down", "green"])
+            if (coordinates[0], coordinates[1]+1) in pattern[(coordinates[0], coordinates[1])].keys():
+                self.rect_infos.append(["right", "green"])
+                self.painter.setBrush(QBrush(QColor(Qt.GlobalColor.green)))
+            else:
+                self.rect_infos.append(["right", "red"])
+                self.painter.setBrush(QBrush(QColor(Qt.GlobalColor.red)))
 
-        self.painter.setBrush(QBrush(QColor(Qt.GlobalColor.green)))
-        self.painter.drawRects(self.rect_list)
+            self.painter.drawRect(rect)
+
+        if coordinates[0] < max_bottom:
+            rect = QRect(150, 250, 100, 100)
+            self.rect_list.append(rect)
+
+            if (coordinates[0]+1, coordinates[1]) in pattern[(coordinates[0], coordinates[1])].keys():
+                self.rect_infos.append(["down", "green"])
+                self.painter.setBrush(QBrush(QColor(Qt.GlobalColor.green)))
+            else:
+                self.rect_infos.append(["down", "red"])
+                self.painter.setBrush(QBrush(QColor(Qt.GlobalColor.red)))
+
+            self.painter.drawRect(rect)
 
         self.painter.setBrush(QBrush(QColor(Qt.GlobalColor.black)))
         self.painter.drawRect(mid_rect)
