@@ -213,9 +213,9 @@ class Grid(QLabel):
         pixmap = self.blank_pixmap.copy()
         painter = QPainter(pixmap)
 
-        for i in range(height):
+        for i in range(height - 1):
             row = []
-            for j in range(width):
+            for j in range(width - 1):
                 case = QRect(j*case_size+self.x, i*case_size+self.y, case_size, case_size)
                 row.append(case)
                 if grid[i][j]:

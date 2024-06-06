@@ -37,7 +37,7 @@ class Controller:
 
     def create_project(self, d:dict):
         self.modele.current_infos = d
-        self.update_vue(self.modele.current_infos["image"], self.modele.current_infos["project_name"], self.modele.current_infos["file_path"])
+        self.update_vue()
 
 
     def load(self):
@@ -51,7 +51,7 @@ class Controller:
 
 
     def update_vue(self):
-        self.vue.setWindowTitle(self.modele.current_infos["project_name"] + " - " + self.modele.current_infos["file_path"])
+        self.vue.setWindowTitle(self.modele.current_infos.get("project_name", ""))
 
         self.vue.main_widget.right.grid.image = self.modele.current_infos["image"]
         self.vue.main_widget.right.grid.update_image()
