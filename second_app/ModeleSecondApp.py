@@ -12,12 +12,15 @@ class ModeleSecondApp:
             "shop_address": "Sans nom",
             "file_path": None,
             "image": "../images/vide.png",
+            "case_size": 50,
             "x": 0,
             "y": 0,
-            "grid": []
+            "grid": [],
+            "pattern": {}
         }
         self.current_position = [0, 0]
         self.destination = []
+        self.product_list = []
     
     def open(self):
         path = QFileDialog.getOpenFileName(caption="Choisissez un projet", filter="Json Files (*.json)")[0]
@@ -43,7 +46,8 @@ class ModeleSecondApp:
     def setDestination(self, destination: list):
         pass
 
-    def loadProject(self, path: str):
+    def open_project(self):
+        path = QFileDialog.getOpenFileName(caption='Ouvrir plan', directory="../projets/", filter="Json Files (*.json)")[0]
         with open(path, 'r') as f:
             self.current_infos = json.load(f)
 
