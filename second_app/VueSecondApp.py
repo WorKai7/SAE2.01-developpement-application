@@ -1,7 +1,8 @@
-import sys
+import sys, json
 from PyQt6.QtWidgets import QApplication, QMainWindow, QToolBar, QStatusBar, \
                             QLabel, QTextEdit, QFileDialog, QDockWidget, QVBoxLayout, \
-                            QHBoxLayout, QComboBox, QWidget, QPushButton
+                            QHBoxLayout, QComboBox, QWidget, QPushButton, QAbstractItemView, \
+                            QListWidget
 from PyQt6.QtGui import QIcon, QAction, QPixmap
 from PyQt6.QtCore import Qt, pyqtSignal
 from pathlib import Path
@@ -41,63 +42,23 @@ class MainWidget(QWidget):
     generatePathClicked = pyqtSignal()
     fetchProductList = pyqtSignal()
 
-    def __init__(self, image_path: str):
+    def __init__(self):
         super().__init__()
 
-        self.__imagePath = image_path
-        self.main_layout = QHBoxLayout()
-        self.setLayout(self.main_layout)
+        layout = QHBoxLayout() ; self.setLayout(layout)
 
-        self.menu_layout = QVBoxLayout()
+        self.left = Left()
+        self.left.setMaximumWidth(800)
+        self.image = Image("../images/vide.png")
 
-        self.menu_layout.addStretch()
+        layout.addWidget(self.left)
+        layout.addWidget(self.image, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        self.product_list_label = QLabel("Produit Destination")
-        self.menu_layout.addWidget(self.product_list_label)
-        self.product_list = QComboBox()
-        self.product_list.currentIndexChanged.connect(self.destinationPicked)
-        self.menu_layout.addWidget(self.product_list)
 
-        self.menu_layout.addSpacing(30)
 
-        self.pick_location_button = QPushButton("Sélectionner Position")
-        self.pick_location_button.clicked.connect(self.setLocation)
-        self.menu_layout.addWidget(self.pick_location_button)
-
-        self.random_location_button = QPushButton("Position Aléatoire")
-        self.random_location_button.clicked.connect(self.setRandomPosition)
-        self.menu_layout.addWidget(self.random_location_button)
-
-        self.menu_layout.addSpacing(30)
-
-        self.generate_path_button = QPushButton("Générer chemin")
-        self.generate_path_button.clicked.connect(self.generatePath)
-        self.menu_layout.addWidget(self.generate_path_button)
-
-        self.menu_layout.addStretch()
-
-        self.main_layout.addLayout(self.menu_layout)
-
-        if not image_path is None:
-            self.showPlan()
 
     def getProductList(self):
         self.fetchProductList.emit()
-
-    def fillProductList(self, product_list: list):
-        for product in product_list:
-            self.product_list.addItem(product)
-
-    def showPlan(self, image_path = None):
-        if image_path != None:
-            self.__imagePath = image_path
-        self.image = Image(self.__imagePath)
-        self.image.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        if self.main_layout.count() != 0:
-            self.main_layout.addWidget(self.image)
-        else:
-            self.main_layout.removeWidget(self.main_layout.itemAt(0))
-            self.main_layout.addWidget(self.image)
 
     def setRandomPosition(self):
         self.selectedPosition.emit(True, [])
@@ -115,6 +76,103 @@ class MainWidget(QWidget):
     def showPathToDestination(self, path: list):
         pass
 
+
+class Left(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        layout = QVBoxLayout() ; self.setLayout(layout)
+
+        self.up = Up()
+        self.buttons = Buttons()
+        self.way_button = QPushButton("Génerer le chemin")
+
+        layout.addWidget(self.up)
+        layout.addWidget(self.buttons)
+        layout.addSpacing(10)
+        layout.addWidget(self.way_button)
+
+
+class Selection(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        layout = QVBoxLayout() ; self.setLayout(layout)
+
+        self.label = QLabel("Séletionnez vos articles:")
+
+        self.categories = QComboBox()
+        self.categories.addItems(["Légumes", "Poissons", "Viandes", "Épicerie", "Épicerie sucrée", "Petit déjeuner", "Fruits", "Rayon frais", "Crèmerie", "Conserves", "Apéritifs", "Boissons", "Articles Maison", "Hygiène", "Bureau", "Animaux"])
+
+        self.products = QListWidget()
+        self.products.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
+        self.update_product_list()
+
+        self.categories.currentTextChanged.connect(self.update_product_list)
+
+        layout.addWidget(self.label)
+        layout.addWidget(self.categories)
+        layout.addWidget(self.products)
+
+    def update_product_list(self):
+        products = self.get_products(self.categories.currentText())
+        self.products.clear()
+        self.products.addItems(products)
+
+        # Check dans la liste de produits et mettre en statue "sélectionné" les articles qui y sont
+        # Fraudra probablement déplacer la fonction
+
+    def get_products(self, category:str):
+        products = []
+        with open("../Liste de produits-20240513/liste_produits.json", encoding="utf-8") as f:
+            products = json.load(f)
+
+        return products.get(category, [])
+
+class Liste(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        layout = QVBoxLayout() ; self.setLayout(layout)
+
+        self.list_label = QLabel("Votre liste de courses:")
+        self.liste = QListWidget()
+        self.liste.setDisabled(True)
+        self.clear_button = QPushButton("Vider la liste")
+
+        layout.addWidget(self.list_label)
+        layout.addWidget(self.liste)
+        layout.addWidget(self.clear_button)
+
+class Up(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        layout = QHBoxLayout() ; self.setLayout(layout)
+
+        self.left = Selection()
+        self.right = Liste()
+
+        layout.addWidget(self.left)
+        layout.addSpacing(20)
+        layout.addWidget(self.right)
+
+
+class Buttons(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        layout = QHBoxLayout() ; self.setLayout(layout)
+
+        self.pos_button = QPushButton("Choisir une position")
+        self.random_pos_button = QPushButton("Position aléatoire")
+        self.end_button = QPushButton("Choisir la position d'arrivée")
+
+        layout.addWidget(self.pos_button)
+        layout.addWidget(self.random_pos_button)
+        layout.addWidget(self.end_button)
+
+
 class VueSecondApp(QMainWindow):
 
     loadClicked = pyqtSignal(str)
@@ -122,8 +180,9 @@ class VueSecondApp(QMainWindow):
 
     def __init__(self, chemin: str = None):
         super().__init__()
+
+        self.resize(1200, 720)
         self.setWindowTitle('StorePathFinder')
-        self.__imagePath = chemin
         menu_bar = self.menuBar()
 
         menu_fichier = menu_bar.addMenu('&Fichier')
@@ -139,7 +198,7 @@ class VueSecondApp(QMainWindow):
         menu_fichier.addSeparator()
         menu_nav.addAction('Générer chemin', self.getPathToProduct)
 
-        self.mainWidget = MainWidget(self.__imagePath)
+        self.mainWidget = MainWidget()
         self.setCentralWidget(self.mainWidget)
 
         self.show()
@@ -179,6 +238,6 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
 
-    fenetre = VueSecondApp("../images/vide.png")
+    fenetre = VueSecondApp()
 
     sys.exit(app.exec())
