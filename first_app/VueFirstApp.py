@@ -16,6 +16,7 @@ class VueFirstApp(QMainWindow):
     saveClicked = pyqtSignal()
     saveasClicked = pyqtSignal()
     openClicked = pyqtSignal()
+    deleteClicked = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -31,6 +32,7 @@ class VueFirstApp(QMainWindow):
         menu_fichier.addAction("Ouvrir", self.open)
         menu_fichier.addAction("Enregistrer", self.save)
         menu_fichier.addAction("Enregistrer sous..", self.save_as)
+        menu_fichier.addAction("Supprimer le projet", self.delete)
 
         menu_edition = menu_bar.addMenu("&Edition")
         menu_edition.addAction("Charger un plan de magasin", self.load)
@@ -44,7 +46,7 @@ class VueFirstApp(QMainWindow):
         self.setCentralWidget(self.main_widget)
 
         self.show()
-        
+
 
     def applyBrightTheme(self):
         '''
@@ -78,7 +80,7 @@ class VueFirstApp(QMainWindow):
             Méthode new: permet à l'utilisateur de créer un nouveau magasin
             Elle émet simplement un signal vers l'extérieur
         '''
-        
+
         self.newClicked.emit()
 
     def open(self):
@@ -112,6 +114,14 @@ class VueFirstApp(QMainWindow):
         '''
 
         self.loadClicked.emit()
+
+    def delete(self):
+        '''
+            Méthode delete: permet à l'utilisateur de supprimer le projet actuellement ouvert
+            Elle émet simplement un signal vers l'éxterieur
+        '''
+
+        self.deleteClicked.emit()
 
 
 
@@ -307,7 +317,7 @@ class Options(QWidget):
 
 
 if __name__ == "__main__":
-    
+
     app = QApplication(sys.argv)
     fenetre = VueFirstApp()
     sys.exit(app.exec())

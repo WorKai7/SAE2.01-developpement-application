@@ -53,7 +53,7 @@ class ModeleFirstApp:
 
 
     def load_image(self):
-        image = QFileDialog.getOpenFileName(caption="Sélectionner un plan", directory="../images", filter="Images (*.png *.jpg *.jpeg *.svg)")[0]
+        image = QFileDialog.getOpenFileName(caption="Sélectionner un plan", directory="../images", filter="*.png *.jpg *.jpeg *.svg")[0]
         if image:
             self.current_infos["image"] = image
             return True

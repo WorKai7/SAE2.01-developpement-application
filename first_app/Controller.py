@@ -1,5 +1,5 @@
-import sys
-from PyQt6.QtWidgets import QApplication
+import sys, os
+from PyQt6.QtWidgets import QApplication, QMessageBox
 from VueFirstApp import VueFirstApp
 from ModeleFirstApp import ModeleFirstApp
 from NewProjectApp import NewProjectApp
@@ -20,6 +20,7 @@ class Controller:
         self.vue.saveClicked.connect(self.modele.save)
         self.vue.saveasClicked.connect(self.modele.save_as)
         self.vue.openClicked.connect(self.open)
+        self.vue.deleteClicked.connect(self.delete)
         self.vue.main_widget.options.drawClicked.connect(self.draw_grid)
         self.vue.main_widget.options.clearClicked.connect(self.clear_grid)
         self.vue.main_widget.right.w_slider.gridMoved.connect(self.move_grid)
@@ -50,6 +51,32 @@ class Controller:
             self.update_vue()
 
 
+    def delete(self):
+        msgBox = QMessageBox()
+        reponse = msgBox.warning(self.vue, "Attention", "Voulez-vous vraiment supprimer le projet en cours ?",
+                                  QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+
+        if reponse == QMessageBox.StandardButton.Yes:
+            if self.modele.current_infos["file_path"]:
+                os.remove(self.modele.current_infos["file_path"])
+                self.modele.current_infos = {
+                    "project_name": "Sans nom",
+                    "project_author": "Sans nom",
+                    "shop_name": "Sans nom",
+                    "shop_address": "Sans nom",
+                    "file_path": "",
+                    "image": "../images/vide.png",
+                    "case_size": 50,
+                    "x": 0,
+                    "y": 0,
+                    "grid": [],
+                    "pattern": {}
+                }
+
+                self.update_vue()
+
+
+
     def update_vue(self):
         self.vue.setWindowTitle(self.modele.current_infos.get("project_name", ""))
 
@@ -69,6 +96,8 @@ class Controller:
         self.vue.main_widget.options.row_number.setValue(len(self.modele.current_infos["grid"]))
         if self.modele.current_infos["grid"]:
             self.vue.main_widget.options.column_number.setValue(len(self.modele.current_infos["grid"][0]))
+        else:
+            self.vue.main_widget.options.column_number.setValue(0)
 
 
     def draw_grid(self, size:tuple):
