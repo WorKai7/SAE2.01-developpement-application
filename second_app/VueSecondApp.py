@@ -5,7 +5,6 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QToolBar, QStatusBar, \
 from PyQt6.QtGui import QIcon, QAction, QPixmap
 from PyQt6.QtCore import Qt, pyqtSignal
 from pathlib import Path
-import json
 
 class ProjectInfos(QWidget):
     def __init__(self, infos: dict):
@@ -37,11 +36,10 @@ class Image(QLabel):
 
 class MainWidget(QWidget):
 
-    loadClicked = pyqtSignal()
-    selectPosClicked = pyqtSignal()
+    selectedPosition = pyqtSignal(bool, list)
     selectedDestination = pyqtSignal()
-    randomPosClicked = pyqtSignal()
     generatePathClicked = pyqtSignal()
+    fetchProductList = pyqtSignal()
 
     def __init__(self, image_path: str):
         super().__init__()
@@ -51,49 +49,77 @@ class MainWidget(QWidget):
         self.setLayout(self.main_layout)
 
         self.menu_layout = QVBoxLayout()
+
         self.menu_layout.addStretch()
+
         self.product_list_label = QLabel("Produit Destination")
         self.menu_layout.addWidget(self.product_list_label)
         self.product_list = QComboBox()
         self.product_list.currentIndexChanged.connect(self.destinationPicked)
         self.menu_layout.addWidget(self.product_list)
+
         self.menu_layout.addSpacing(30)
+
         self.pick_location_button = QPushButton("Sélectionner Position")
-        self.pick_location_button.clicked.connect(self.pickLocation)
+        self.pick_location_button.clicked.connect(self.setLocation)
         self.menu_layout.addWidget(self.pick_location_button)
+
         self.random_location_button = QPushButton("Position Aléatoire")
         self.random_location_button.clicked.connect(self.setRandomPosition)
         self.menu_layout.addWidget(self.random_location_button)
+
         self.menu_layout.addSpacing(30)
+
         self.generate_path_button = QPushButton("Générer chemin")
         self.generate_path_button.clicked.connect(self.generatePath)
         self.menu_layout.addWidget(self.generate_path_button)
-        self.main_layout.addLayout(self.menu_layout)
+
         self.menu_layout.addStretch()
+
+        self.main_layout.addLayout(self.menu_layout)
 
         if not image_path is None:
             self.showPlan()
+
+    def getProductList(self):
+        self.fetchProductList.emit()
+
+    def fillProductList(self, product_list: list):
+        for product in product_list:
+            self.product_list.addItem(product)
 
     def showPlan(self, image_path = None):
         if image_path != None:
             self.__imagePath = image_path
         self.image = Image(self.__imagePath)
         self.image.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.main_layout.addWidget(self.image)
+        if self.main_layout.count() != 0:
+            self.main_layout.addWidget(self.image)
+        else:
+            self.main_layout.removeWidget(self.main_layout.itemAt(0))
+            self.main_layout.addWidget(self.image)
 
     def setRandomPosition(self):
-        pass
+        self.selectedPosition.emit(True, [])
 
-    def pickLocation(self):
-        pass
+    def setLocation(self):
+        location = [0,0] ##Récupérer endroit cliqué par l'utilisateur puis envoyer dans signal
+        self.selectedPosition.emit(False, location)
 
-    def destinationPicked():
-        pass
+    def destinationPicked(self):
+        self.selectedDestination.emit()
 
-    def generatePath():
+    def generatePath(self):
+        self.generatePathClicked.emit()
+
+    def showPathToDestination(self, path: list):
         pass
 
 class VueSecondApp(QMainWindow):
+
+    loadClicked = pyqtSignal(str)
+    infosClicked = pyqtSignal()
+
     def __init__(self, chemin: str = None):
         super().__init__()
         self.setWindowTitle('StorePathFinder')
@@ -119,30 +145,32 @@ class VueSecondApp(QMainWindow):
         self.show()
 
     def getPathToProduct(self):
-        pass
+        self.mainWidget.generatePath()
 
     def setPos(self):
-        pass
+        self.mainWidget.setLocation()
 
     def setGoal(self):
-        pass
+        self.mainWidget.destinationPicked()
 
     def updatePlan(self, image_path = None):
         self.new_product_list = QComboBox()
         self.mainWidget.main_layout.replaceWidget(self.mainWidget.product_list, self.new_product_list)
+        self.mainWidget.getProductList()
         self.mainWidget.main_layout.removeWidget(self.mainWidget.image)
         self.mainWidget.showPlan(image_path)
 
     def setProject(self):
-        self.loadClicked.emit()
         filepath = QFileDialog.getOpenFileName(self, 'Ouvrir plan', str(Path.cwd()), "Json Files (*.json)")
-        with open(filepath[0], 'r') as f:
-            self.project_infos = json.load(f)
-            self.__imagePath = self.project_infos["image"]
-        self.updatePlan(self.__imagePath)
+        self.loadClicked.emit(filepath[0])
 
     def viewInfos(self):
-        ProjectInfos(self.project_infos)
+        self.infosClicked.emit()
+
+    def updateInfos(self, infos: dict):
+        self.project_infos = infos
+        self.__imagePath = self.project_infos["image"]
+        self.updatePlan(self.__imagePath)
 
 
 ## -----------------------------------------------------------------------------
