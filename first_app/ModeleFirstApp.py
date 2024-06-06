@@ -33,6 +33,8 @@ class ModeleFirstApp:
     def save_as(self):
         path = QFileDialog.getSaveFileName(caption="Enregistrer sous", directory="../projets", filter="Projet JSON")[0]
         if path:
+            if path[-5:] != ".json":
+                path += ".json"
             self.current_infos["file_path"] = path
             with open(path, 'w', encoding="utf8") as f:
                 self.convert_tuples_to_str()
