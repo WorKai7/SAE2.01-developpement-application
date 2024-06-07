@@ -24,7 +24,6 @@ class Controller():
         self.vue.mainWidget.left.generateClicked.connect(self.generate_path)
         self.vue.mainWidget.left.eraseClicked.connect(self.update_vue)
         self.vue.mainWidget.left.up.selection.updateList.connect(self.update_list)
-        self.vue.mainWidget.image.rectClicked.connect(self.product_info)
 
 
     def add_article(self):
@@ -105,6 +104,19 @@ class Controller():
         self.vue.mainWidget.image.draw_grid(self.modele.current_infos["grid"], self.modele.current_infos["x"],
                                             self.modele.current_infos["y"], self.modele.current_infos["case_size"])
 
+        if not self.modele.current_position or not self.modele.destination:
+            for i in range(len(self.modele.current_infos["grid"])):
+                for j in range(len(self.modele.current_infos["grid"][i])):
+                    if self.modele.current_infos["grid"][i][j]:
+                        if self.modele.current_infos["grid"][i][j][1] == "Entrée":
+                            if not self.modele.current_position:
+                                self.modele.current_position = (i, j)
+                                self.modele.current_infos["grid"][i][j] = None
+                        elif self.modele.current_infos["grid"][i][j][1] == "Sortie":
+                            if not self.modele.destination:
+                                self.modele.destination = (i, j)
+                                self.modele.current_infos["grid"][i][j] = None
+
         if self.modele.current_position:
             self.vue.mainWidget.image.draw_rect(self.modele.current_position, self.modele.current_infos["x"], self.modele.current_infos["y"],
                                                 self.modele.current_infos["case_size"], (0, 0, 255, 200))
@@ -120,11 +132,6 @@ class Controller():
         if path:
             self.vue.mainWidget.image.draw_path(path, self.modele.current_infos["x"], self.modele.current_infos["y"],
                                                 self.modele.current_infos["case_size"])
-
-    def product_info(self, coordinates:tuple):
-        if self.modele.current_infos["grid"][coordinates[0]][coordinates[1]]:
-            self.popup = Popup(coordinates[0], coordinates[1], self.modele.current_infos["grid"][coordinates[0]][coordinates[1]][1])
-            self.popup.show()
 
 
 

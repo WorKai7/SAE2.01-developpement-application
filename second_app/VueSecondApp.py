@@ -30,7 +30,6 @@ class Image(QLabel):
 
     startClicked = pyqtSignal(tuple)
     endClicked = pyqtSignal(tuple)
-    rectClicked = pyqtSignal(tuple)
 
     def __init__(self, chemin: str):
         super().__init__()
@@ -98,19 +97,18 @@ class Image(QLabel):
 
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            for i in range(len(self.grid)):
-                for j in range(len(self.grid[i])):
-                    rect = self.grid[i][j]
-                    if rect.contains(event.pos()):
-                        if self.selecting_start:
-                            self.startClicked.emit((i, j))
-                            self.selecting_start = False
-                        elif self.selecting_end:
-                            self.endClicked.emit((i, j))
-                            self.selecting_end = False
-                        else:
-                            self.rectClicked.emit((i, j))
+        if self.selecting_start or self.selecting_end:
+            if event.button() == Qt.MouseButton.LeftButton:
+                for i in range(len(self.grid)):
+                    for j in range(len(self.grid[i])):
+                        rect = self.grid[i][j]
+                        if rect.contains(event.pos()):
+                            if self.selecting_start:
+                                self.startClicked.emit((i, j))
+                                self.selecting_start = False
+                            elif self.selecting_end:
+                                self.endClicked.emit((i, j))
+                                self.selecting_end = False
 
 class MainWidget(QWidget):
 
