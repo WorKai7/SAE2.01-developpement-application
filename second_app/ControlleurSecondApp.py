@@ -3,7 +3,7 @@ from random import randint
 from PyQt6.QtWidgets import QApplication
 from VueSecondApp import VueSecondApp
 from ModeleSecondApp import ModeleSecondApp
-import copy
+import json
 
 class Controller():
     def __init__(self):
@@ -19,7 +19,8 @@ class Controller():
         self.vue.mainWidget.left.buttons.selectEnd.connect(self.set_select_end)
         self.vue.mainWidget.image.startClicked.connect(self.select_start)
         self.vue.mainWidget.image.endClicked.connect(self.select_end)
-        self.vue.mainWidget.left.generateClicked.connect(self.generateAllPaths)
+        self.vue.mainWidget.left.generateClicked.connect(self.generate_path)
+        self.vue.mainWidget.left.up.selection.updateList.connect(self.update_list)
 
 
     def add_article(self):
@@ -38,6 +39,26 @@ class Controller():
             self.vue.mainWidget.left.up.liste.liste.setCurrentItem(None)
 
 
+    def update_list(self):
+        products = self.get_products(self.vue.mainWidget.left.up.selection.categories.currentText())
+        self.vue.mainWidget.left.up.selection.products.clear()
+        self.vue.mainWidget.left.up.selection.products.addItems(products)
+
+    def get_products(self, category:str):
+        liste = []
+        with open("../Liste de produits-20240513/liste_produits.json", encoding="utf-8") as f:
+            products = json.load(f)
+
+        if self.modele.current_infos["grid"]:
+            for product in products[category]:
+                for ligne in self.modele.current_infos["grid"]:
+                    for produit in ligne:
+                        if produit and produit[1] == product:
+                            liste.append(product)
+
+        return liste
+
+
     def open_project(self):
         self.modele.open_project()
         self.update_vue()
@@ -45,7 +66,7 @@ class Controller():
 
     def select_random_pos(self):
         if self.modele.current_infos["grid"]:
-            self.modele.current_position = [randint(1, len(self.modele.current_infos["grid"]))-1, randint(1, len(self.modele.current_infos["grid"][0]))-1]
+            self.modele.current_position = (randint(1, len(self.modele.current_infos["grid"]))-1, randint(1, len(self.modele.current_infos["grid"][0]))-1)
             self.update_vue()
 
 
@@ -60,13 +81,13 @@ class Controller():
 
     def select_start(self, coordinates:tuple):
         if self.modele.current_infos["grid"]:
-            self.modele.current_position = [coordinates[0], coordinates[1]]
+            self.modele.current_position = coordinates
             self.update_vue()
             self.vue.mainWidget.left.label.hide()
 
     def select_end(self, coordinates:tuple):
         if self.modele.current_infos["grid"]:
-            self.modele.destination = [coordinates[0], coordinates[1]]
+            self.modele.destination = coordinates
             self.update_vue()
             self.vue.mainWidget.left.label.hide()
 
@@ -88,29 +109,12 @@ class Controller():
             self.vue.mainWidget.image.draw_rect(self.modele.destination, self.modele.current_infos["x"], self.modele.current_infos["y"],
                                                 self.modele.current_infos["case_size"], (255, 0, 0, 200))
 
-    def generateAllPaths(self):
-        final_path = []
-        position = self.modele.current_position
-        liste_course = copy.deepcopy(self.modele.product_list)
-        for i in range(len(liste_course)):
-            path_list=  []
-            for produit in liste_course:
-                for colonne in self.modele.current_infos["grid"]:
-                    if produit in colonne:
-                        path_list.append([produit ,self.modele.generatePathToDestination(self.modele.current_infos["pattern"], position, colonne.index(produit)), colonne.index(produit)])
-            min_path = path_list[0][1]
-            min_produit = path_list[0][0]
-            min_position = path_list[0][2]
-            for produit, path, position in path_list:
-                if len(path) < len(min_path):
-                    min_path = path
-                    min_produit = produit
-                    min_position = position
-            final_path.append(min_path)
-            position = min_position
-            liste_course.remove(min_produit)
+        self.update_list()
 
-        return final_path
+    def generate_path(self):
+        path = self.modele.generateAllPaths()
+
+        print(path)
 
 
 

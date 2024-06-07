@@ -53,7 +53,6 @@ class Image(QLabel):
         self.setPixmap(self.pixmap)
 
     def draw_grid(self, grid:list, x:int, y:int, case_size:int):
-        print(self.pixmap)
         if grid:
             width = len(grid[0])
         else:
@@ -78,7 +77,7 @@ class Image(QLabel):
         painter.end()
 
 
-    def draw_rect(self, pos:list, x:int, y:int, case_size:int, color:tuple):
+    def draw_rect(self, pos:tuple, x:int, y:int, case_size:int, color:tuple):
         rect = QRect(pos[1]*case_size+x, pos[0]*case_size+y, case_size, case_size)
         painter = QPainter(self.pixmap)
         painter.setBrush(QColor(color[0], color[1], color[2], color[3]))
@@ -95,12 +94,10 @@ class Image(QLabel):
                         rect = self.grid[i][j]
                         if rect.contains(event.pos()):
                             if self.selecting_start:
-                                print("select start")
                                 self.startClicked.emit((i, j))
                                 self.selecting_start = False
                             elif self.selecting_end:
                                 self.endClicked.emit((i, j))
-                                print("select end")
                                 self.selecting_end = False
 
 class MainWidget(QWidget):
@@ -177,6 +174,7 @@ class Left(QWidget):
 class Selection(QWidget):
 
     addClicked = pyqtSignal()
+    updateList = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -190,7 +188,6 @@ class Selection(QWidget):
 
         self.products = QListWidget()
         self.products.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self.update_product_list()
 
         self.add_button = QPushButton("Ajouter l'article sélectionné")
 
@@ -208,16 +205,8 @@ class Selection(QWidget):
         self.addClicked.emit()
 
     def update_product_list(self):
-        products = self.get_products(self.categories.currentText())
-        self.products.clear()
-        self.products.addItems(products)
+        self.updateList.emit()
 
-    def get_products(self, category:str):
-        products = []
-        with open("../Liste de produits-20240513/liste_produits.json", encoding="utf-8") as f:
-            products = json.load(f)
-
-        return products.get(category, [])
 
 class Liste(QWidget):
 
