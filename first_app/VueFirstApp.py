@@ -38,8 +38,8 @@ class VueFirstApp(QMainWindow):
         menu_edition.addAction("Charger un plan de magasin", self.load)
 
         menu_theme = menu_bar.addMenu("&Thèmes")
-        menu_theme.addAction("Clair", self.applyBrightTheme)
-        menu_theme.addAction("Sombre", self.applyDarkTheme)
+        menu_theme.addAction("Sombre", self.applyDarkTheme) 
+        menu_theme.addAction("Material Dark", self.applyMaterialDark)
         menu_theme.addAction("Défaut", self.resetTheme)
 
         self.main_widget = MainWidget()
@@ -64,6 +64,17 @@ class VueFirstApp(QMainWindow):
         '''
 
         fichier_style = open("../fichiers_qss/darkstyle.qss", 'r')
+        with fichier_style:
+            qss = fichier_style.read()
+            self.setStyleSheet(qss)
+
+
+    def applyMaterialDark(self):
+        '''
+            Méthode applyMaterialDark: permet à l'utilisateur de basculer vers le thème Material Dark
+        '''
+
+        fichier_style = open("../fichiers_qss/materialdark.qss", 'r')
         with fichier_style:
             qss = fichier_style.read()
             self.setStyleSheet(qss)
@@ -250,7 +261,6 @@ class Grid(QLabel):
                     rect = self.grid[i][j]
                     if rect.contains(event.pos()):
                         self.rectClicked.emit((i, j))
-
 
 
 class Options(QWidget):

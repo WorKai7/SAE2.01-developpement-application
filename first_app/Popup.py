@@ -88,7 +88,7 @@ class Left(QWidget):
         layout = QVBoxLayout() ; self.setLayout(layout)
 
         self.categories = QComboBox()
-        self.categories.addItems(["Légumes", "Poissons", "Viandes", "Épicerie", "Épicerie sucrée", "Petit déjeuner", "Fruits", "Rayon frais", "Crèmerie", "Conserves", "Apéritifs", "Boissons", "Articles Maison", "Hygiène", "Bureau", "Animaux"])
+        self.categories.addItems(["Entrée/Sortie", "Légumes", "Poissons", "Viandes", "Épicerie", "Épicerie sucrée", "Petit déjeuner", "Fruits", "Rayon frais", "Crèmerie", "Conserves", "Apéritifs", "Boissons", "Articles Maison", "Hygiène", "Bureau", "Animaux"])
 
         self.products = QListWidget()
         self.products.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)

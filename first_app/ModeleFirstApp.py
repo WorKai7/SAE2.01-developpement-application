@@ -31,7 +31,7 @@ class ModeleFirstApp:
 
 
     def save_as(self):
-        path = QFileDialog.getSaveFileName(caption="Enregistrer sous", directory="../projets", filter="Projet JSON")[0]
+        path = QFileDialog.getSaveFileName(caption="Enregistrer sous", directory="../projets", filter="Projet JSON")[0] + ".json"
         if path:
             if path[-5:] != ".json":
                 path += ".json"

@@ -83,7 +83,7 @@ class NewProjectApp(QWidget):
 
 
     def browse(self):
-        image = QFileDialog.getOpenFileName(self, "Choisissez le plan", "", "Fichier PNG (*.png) ;; Fichier JPG (*.jpg *.jpeg) ;; Fichier SVG (*.svg)")[0]
+        image = QFileDialog.getOpenFileName(self, "Choisissez le plan", "../images", "Fichier PNG (*.png) ;; Fichier JPG (*.jpg *.jpeg) ;; Fichier SVG (*.svg)")[0]
 
         if image:
             self.infos["image"] = image
