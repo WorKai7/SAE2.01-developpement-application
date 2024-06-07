@@ -1,4 +1,4 @@
-import sys, json
+import sys, time
 from PyQt6.QtWidgets import QApplication, QMainWindow, QToolBar, QStatusBar, \
                             QLabel, QTextEdit, QFileDialog, QDockWidget, QVBoxLayout, \
                             QHBoxLayout, QComboBox, QWidget, QPushButton, QAbstractItemView, \
@@ -30,6 +30,7 @@ class Image(QLabel):
 
     startClicked = pyqtSignal(tuple)
     endClicked = pyqtSignal(tuple)
+    rectClicked = pyqtSignal(tuple)
 
     def __init__(self, chemin: str):
         super().__init__()
@@ -85,20 +86,31 @@ class Image(QLabel):
         painter.end()
         self.setPixmap(self.pixmap)
 
+    def draw_path(self, path:list, x:int, y:int, case_size:int):
+        pas = 255//len(path)
+        rouge = 0
+        bleu = 255
+
+        for i in range(len(path)):
+            self.draw_rect(path[i], x, y, case_size, (rouge, 0, bleu, 128))
+            rouge += pas
+            bleu -= pas
+
 
     def mousePressEvent(self, event):
-        if self.selecting_start or self.selecting_end:
-            if event.button() == Qt.MouseButton.LeftButton:
-                for i in range(len(self.grid)):
-                    for j in range(len(self.grid[i])):
-                        rect = self.grid[i][j]
-                        if rect.contains(event.pos()):
-                            if self.selecting_start:
-                                self.startClicked.emit((i, j))
-                                self.selecting_start = False
-                            elif self.selecting_end:
-                                self.endClicked.emit((i, j))
-                                self.selecting_end = False
+        if event.button() == Qt.MouseButton.LeftButton:
+            for i in range(len(self.grid)):
+                for j in range(len(self.grid[i])):
+                    rect = self.grid[i][j]
+                    if rect.contains(event.pos()):
+                        if self.selecting_start:
+                            self.startClicked.emit((i, j))
+                            self.selecting_start = False
+                        elif self.selecting_end:
+                            self.endClicked.emit((i, j))
+                            self.selecting_end = False
+                        else:
+                            self.rectClicked.emit((i, j))
 
 class MainWidget(QWidget):
 
@@ -145,6 +157,7 @@ class MainWidget(QWidget):
 class Left(QWidget):
 
     generateClicked = pyqtSignal()
+    eraseClicked = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -156,6 +169,7 @@ class Left(QWidget):
         self.label.hide()
         self.buttons = Buttons()
         self.way_button = QPushButton("Génerer le chemin")
+        self.erase_way_button = QPushButton("Effacer le chemin")
 
         layout.addWidget(self.up)
         layout.addSpacing(10)
@@ -163,12 +177,17 @@ class Left(QWidget):
         layout.addWidget(self.buttons)
         layout.addSpacing(10)
         layout.addWidget(self.way_button)
+        layout.addWidget(self.erase_way_button)
 
         self.way_button.clicked.connect(self.generate)
+        self.erase_way_button.clicked.connect(self.erase)
 
 
     def generate(self):
         self.generateClicked.emit()
+
+    def erase(self):
+        self.eraseClicked.emit()
 
 
 class Selection(QWidget):

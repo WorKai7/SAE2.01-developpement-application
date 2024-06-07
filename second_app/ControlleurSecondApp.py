@@ -3,6 +3,7 @@ from random import randint
 from PyQt6.QtWidgets import QApplication
 from VueSecondApp import VueSecondApp
 from ModeleSecondApp import ModeleSecondApp
+from Popup import Popup
 import json
 
 class Controller():
@@ -10,6 +11,7 @@ class Controller():
         
         self.vue = VueSecondApp()
         self.modele = ModeleSecondApp()
+        self.popup = None
 
         self.vue.loadClicked.connect(self.open_project)
         self.vue.mainWidget.left.up.selection.addClicked.connect(self.add_article)
@@ -20,7 +22,9 @@ class Controller():
         self.vue.mainWidget.image.startClicked.connect(self.select_start)
         self.vue.mainWidget.image.endClicked.connect(self.select_end)
         self.vue.mainWidget.left.generateClicked.connect(self.generate_path)
+        self.vue.mainWidget.left.eraseClicked.connect(self.update_vue)
         self.vue.mainWidget.left.up.selection.updateList.connect(self.update_list)
+        self.vue.mainWidget.image.rectClicked.connect(self.product_info)
 
 
     def add_article(self):
@@ -113,8 +117,14 @@ class Controller():
 
     def generate_path(self):
         path = self.modele.generateAllPaths()
+        if path:
+            self.vue.mainWidget.image.draw_path(path, self.modele.current_infos["x"], self.modele.current_infos["y"],
+                                                self.modele.current_infos["case_size"])
 
-        print(path)
+    def product_info(self, coordinates:tuple):
+        if self.modele.current_infos["grid"][coordinates[0]][coordinates[1]]:
+            self.popup = Popup(coordinates[0], coordinates[1], self.modele.current_infos["grid"][coordinates[0]][coordinates[1]][1])
+            self.popup.show()
 
 
 

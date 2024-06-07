@@ -1,7 +1,7 @@
 import json
 from PyQt6.QtWidgets import QFileDialog
 import random
-from filepile import File, Pile
+from pile import Pile
 import copy
 
 class ModeleSecondApp:
@@ -37,59 +37,80 @@ class ModeleSecondApp:
         pass
 
     def generateAllPaths(self):
-        final_path = []
-        position = self.current_position
-        liste_course = copy.deepcopy(self.product_list)
-        for i in range(len(liste_course)):
-            path_list=  []
-            for produit in liste_course:
-                for ligne in self.current_infos["grid"]:
-                    for product in ligne:
-                        if product and product[1] == produit:
-                            path_list.append([produit, self.generatePathToDestination(self.current_infos["pattern"], position, (self.current_infos["grid"].index(ligne), ligne.index(product))), (self.current_infos["grid"].index(ligne), ligne.index(product))])
-            min_path = path_list[0][1]
-            min_produit = path_list[0][0]
-            min_position = path_list[0][2]
-            for produit, path, position in path_list:
-                if len(path) < len(min_path):
-                    min_path = path
-                    min_produit = produit
-                    min_position = position
-            final_path.append(min_path)
-            position = min_position
-            liste_course.remove(min_produit)
+        if self.current_position and self.destination:
+            final_path = []
+            position = self.current_position
+            liste_course = copy.deepcopy(self.product_list)
+            for i in range(len(liste_course)):
+                path_list=  []
+                for produit in liste_course:
+                    for ligne in self.current_infos["grid"]:
+                        for product in ligne:
+                            if product and product[1] == produit:
+                                path_list.append([produit, self.parcours(self.current_infos["pattern"], position, (self.current_infos["grid"].index(ligne), ligne.index(product))), (self.current_infos["grid"].index(ligne), ligne.index(product))])
+                min_path = path_list[0][1]
+                min_produit = path_list[0][0]
+                min_position = path_list[0][2]
+                for produit, path, position in path_list:
+                    if len(path) < len(min_path):
+                        min_path = path
+                        min_produit = produit
+                        min_position = position
+                final_path += min_path
+                position = min_position
+                liste_course.remove(min_produit)
 
-        return final_path
+            final_path += self.parcours(self.current_infos["pattern"], position, self.destination)
 
-    def generatePathToDestination(self, dico_graphe: dict, depart: tuple, arrivee: tuple):
-        '''La fonction effectue un parcours en profondeur et retourne un chemin entre le départ & l'arrivée'''
+            return final_path
 
-        assert isinstance(dico_graphe, dict), "L'argument utilisé n'est pas conforme : type dict() attendu."   # vérification de l'argument
+    def parcours(self, dico_graphe:dict, depart:tuple, arrivee:tuple):
+        """
+            Vieux parcours en profodeur tout nul
+        """
+        p1:Pile = Pile()
+        p1.empiler(depart)
 
-        voisins = Pile(1000)
-        voisins.empiler(depart)
         parcours = []
-        liste_parcours = []
-        while voisins.est_vide() == False:
-            sommet = voisins.depiler()
+
+        while arrivee not in parcours:
+            sommet = p1.depiler()
             parcours.append(sommet)
-            if sommet == arrivee:
-                parcours2 = copy.deepcopy(parcours)
-                liste_parcours.append(parcours2)
-
             for voisin in dico_graphe[sommet].keys():
-                if (voisin not in parcours):
-                    voisins.empiler(voisin)
-                elif len(dico_graphe[sommet].keys()) == 1 and voisin in parcours and sommet != arrivee:
-                    old_sommet = parcours[parcours.index(sommet)-1]
-                    parcours.remove(sommet)
-                    sommet = old_sommet
-                    while len(dico_graphe[sommet].keys()) == 2:
-                        old_sommet = parcours[parcours.index(old_sommet)-1]
-                        parcours.remove(sommet)
-                        sommet = old_sommet
+                if voisin not in parcours and not p1.contient(voisin):
+                    p1.empiler(voisin)
 
-        return liste_parcours
+        return parcours
+
+    # def generatePathToDestination(self, dico_graphe: dict, depart: tuple, arrivee: tuple):
+    #     '''La fonction effectue un parcours en profondeur et retourne un chemin entre le départ & l'arrivée'''
+
+    #     assert isinstance(dico_graphe, dict), "L'argument utilisé n'est pas conforme : type dict() attendu."   # vérification de l'argument
+
+    #     voisins = Pile(1000)
+    #     voisins.empiler(depart)
+    #     parcours = []
+    #     liste_parcours = []
+    #     while voisins.est_vide() == False:
+    #         sommet = voisins.depiler()
+    #         parcours.append(sommet)
+    #         if sommet == arrivee:
+    #             parcours2 = copy.deepcopy(parcours)
+    #             liste_parcours.append(parcours2)
+
+    #         for voisin in dico_graphe[sommet].keys():
+    #             if (voisin not in parcours):
+    #                 voisins.empiler(voisin)
+    #             elif len(dico_graphe[sommet].keys()) == 1 and voisin in parcours and sommet != arrivee:
+    #                 old_sommet = parcours[parcours.index(sommet)-1]
+    #                 parcours.remove(sommet)
+    #                 sommet = old_sommet
+    #                 while len(dico_graphe[sommet].keys()) == 2:
+    #                     old_sommet = parcours[parcours.index(old_sommet)-1]
+    #                     parcours.remove(sommet)
+    #                     sommet = old_sommet
+
+    #     return liste_parcours
 
     def open_project(self):
         path = QFileDialog.getOpenFileName(caption='Ouvrir plan', directory="../projets/", filter="Json Files (*.json)")[0]
