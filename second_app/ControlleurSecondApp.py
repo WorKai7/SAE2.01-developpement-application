@@ -14,8 +14,10 @@ class Controller():
         self.vue.mainWidget.left.up.selection.addClicked.connect(self.add_article)
         self.vue.mainWidget.left.up.liste.deleteClicked.connect(self.delete_article)
         self.vue.mainWidget.left.buttons.randomStart.connect(self.select_random_pos)
-        self.vue.mainWidget.left.buttons.selectStart.connect(self.select_start)
-        self.vue.mainWidget.left.buttons.selectEnd.connect(self.select_end)
+        self.vue.mainWidget.left.buttons.selectStart.connect(self.set_select_start)
+        self.vue.mainWidget.left.buttons.selectEnd.connect(self.set_select_end)
+        self.vue.mainWidget.image.startClicked.connect(self.select_start)
+        self.vue.mainWidget.image.endClicked.connect(self.select_end)
 
 
     def add_article(self):
@@ -41,16 +43,30 @@ class Controller():
 
     def select_random_pos(self):
         if self.modele.current_infos["grid"]:
-            self.modele.current_position = [randint(0, len(self.modele.current_infos["grid"])), randint(0, len(self.modele.current_infos["grid"][0]))]
+            self.modele.current_position = [randint(1, len(self.modele.current_infos["grid"]))-1, randint(1, len(self.modele.current_infos["grid"][0]))-1]
             self.update_vue()
 
 
-    def select_start(self):
-        pass
+    def set_select_start(self):
+        self.vue.mainWidget.image.selecting_start = True
+        self.vue.mainWidget.left.label.show()
 
 
-    def select_end(self):
-        pass
+    def set_select_end(self):
+        self.vue.mainWidget.image.selecting_end = True
+        self.vue.mainWidget.left.label.show()
+
+    def select_start(self, coordinates:tuple):
+        if self.modele.current_infos["grid"]:
+            self.modele.current_position = [coordinates[0], coordinates[1]]
+            self.update_vue()
+            self.vue.mainWidget.left.label.hide()
+
+    def select_end(self, coordinates:tuple):
+        if self.modele.current_infos["grid"]:
+            self.modele.destination = [coordinates[0], coordinates[1]]
+            self.update_vue()
+            self.vue.mainWidget.left.label.hide()
 
 
     def update_vue(self):
@@ -63,8 +79,12 @@ class Controller():
                                             self.modele.current_infos["y"], self.modele.current_infos["case_size"])
 
         if self.modele.current_position:
-            self.vue.mainWidget.image.draw_rect(self.modele.current_position, self.modele.current_infos["x"], self.modele.current_infos["y"], self.modele.current_infos["case_size"], (0, 0, 255))
+            self.vue.mainWidget.image.draw_rect(self.modele.current_position, self.modele.current_infos["x"], self.modele.current_infos["y"],
+                                                self.modele.current_infos["case_size"], (0, 0, 255, 200))
 
+        if self.modele.destination:
+            self.vue.mainWidget.image.draw_rect(self.modele.destination, self.modele.current_infos["x"], self.modele.current_infos["y"],
+                                                self.modele.current_infos["case_size"], (255, 0, 0, 200))
 
 
 if __name__ == "__main__":

@@ -28,6 +28,9 @@ class ProjectInfos(QWidget):
 
 class Image(QLabel):
 
+    startClicked = pyqtSignal(tuple)
+    endClicked = pyqtSignal(tuple)
+
     def __init__(self, chemin: str):
         super().__init__()
 
@@ -35,7 +38,8 @@ class Image(QLabel):
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap)
         self.grid = []
-        self.selecting = False
+        self.selecting_start = False
+        self.selecting_end = False
 
     def update_image(self):
         self.pixmap = QPixmap(self.image)
@@ -76,20 +80,27 @@ class Image(QLabel):
     def draw_rect(self, pos:list, x:int, y:int, case_size:int, color:tuple):
         rect = QRect(pos[1]*case_size+x, pos[0]*case_size+y, case_size, case_size)
         painter = QPainter(self.pixmap)
-        painter.setBrush(QColor(color[0], color[1], color[2]))
+        painter.setBrush(QColor(color[0], color[1], color[2], color[3]))
         painter.drawRect(rect)
         painter.end()
         self.setPixmap(self.pixmap)
 
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            for i in range(len(self.grid)):
-                for j in range(len(self.grid[i])):
-                    rect = self.grid[i][j]
-                    if rect.contains(event.pos()):
-                        if self.selecting:
-                            pass # on chope le rect et on l'assigne a la position de depart ou arrivee
+        if self.selecting_start or self.selecting_end:
+            if event.button() == Qt.MouseButton.LeftButton:
+                for i in range(len(self.grid)):
+                    for j in range(len(self.grid[i])):
+                        rect = self.grid[i][j]
+                        if rect.contains(event.pos()):
+                            if self.selecting_start:
+                                print("select start")
+                                self.startClicked.emit((i, j))
+                                self.selecting_start = False
+                            elif self.selecting_end:
+                                self.endClicked.emit((i, j))
+                                print("select end")
+                                self.selecting_end = False
 
 class MainWidget(QWidget):
 
@@ -134,6 +145,9 @@ class MainWidget(QWidget):
 
 
 class Left(QWidget):
+
+    generateClicked = pyqtSignal()
+
     def __init__(self):
         super().__init__()
 
@@ -151,6 +165,12 @@ class Left(QWidget):
         layout.addWidget(self.buttons)
         layout.addSpacing(10)
         layout.addWidget(self.way_button)
+
+        self.way_button.clicked.connect(self.generate)
+
+
+    def generate(self):
+        self.generateClicked.emit()
 
 
 class Selection(QWidget):
