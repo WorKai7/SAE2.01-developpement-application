@@ -1,4 +1,5 @@
 import sys
+from random import randint
 from PyQt6.QtWidgets import QApplication
 from VueSecondApp import VueSecondApp
 from ModeleSecondApp import ModeleSecondApp
@@ -12,6 +13,9 @@ class Controller():
         self.vue.loadClicked.connect(self.open_project)
         self.vue.mainWidget.left.up.selection.addClicked.connect(self.add_article)
         self.vue.mainWidget.left.up.liste.deleteClicked.connect(self.delete_article)
+        self.vue.mainWidget.left.buttons.randomStart.connect(self.select_random_pos)
+        self.vue.mainWidget.left.buttons.selectStart.connect(self.select_start)
+        self.vue.mainWidget.left.buttons.selectEnd.connect(self.select_end)
 
 
     def add_article(self):
@@ -35,6 +39,20 @@ class Controller():
         self.update_vue()
 
 
+    def select_random_pos(self):
+        if self.modele.current_infos["grid"]:
+            self.modele.current_position = [randint(0, len(self.modele.current_infos["grid"])), randint(0, len(self.modele.current_infos["grid"][0]))]
+            self.update_vue()
+
+
+    def select_start(self):
+        pass
+
+
+    def select_end(self):
+        pass
+
+
     def update_vue(self):
         self.vue.setWindowTitle("StorePathFinder - " + self.modele.current_infos["project_name"])
 
@@ -43,6 +61,9 @@ class Controller():
 
         self.vue.mainWidget.image.draw_grid(self.modele.current_infos["grid"], self.modele.current_infos["x"],
                                             self.modele.current_infos["y"], self.modele.current_infos["case_size"])
+
+        if self.modele.current_position:
+            self.vue.mainWidget.image.draw_rect(self.modele.current_position, self.modele.current_infos["x"], self.modele.current_infos["y"], self.modele.current_infos["case_size"], (0, 0, 255))
 
 
 

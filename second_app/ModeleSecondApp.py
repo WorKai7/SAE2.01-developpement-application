@@ -18,7 +18,7 @@ class ModeleSecondApp:
             "grid": [],
             "pattern": {}
         }
-        self.current_position = [0, 0]
+        self.current_position = []
         self.destination = []
         self.product_list = []
     

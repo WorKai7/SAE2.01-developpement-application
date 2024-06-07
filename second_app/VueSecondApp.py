@@ -73,6 +73,15 @@ class Image(QLabel):
         painter.end()
 
 
+    def draw_rect(self, pos:list, x:int, y:int, case_size:int, color:tuple):
+        rect = QRect(pos[1]*case_size+x, pos[0]*case_size+y, case_size, case_size)
+        painter = QPainter(self.pixmap)
+        painter.setBrush(QColor(color[0], color[1], color[2]))
+        painter.drawRect(rect)
+        painter.end()
+        self.setPixmap(self.pixmap)
+
+
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             for i in range(len(self.grid)):
@@ -227,6 +236,11 @@ class Up(QWidget):
 
 
 class Buttons(QWidget):
+
+    randomStart = pyqtSignal()
+    selectStart = pyqtSignal()
+    selectEnd = pyqtSignal()
+
     def __init__(self):
         super().__init__()
 
@@ -239,6 +253,20 @@ class Buttons(QWidget):
         layout.addWidget(self.random_pos_button)
         layout.addWidget(self.pos_button)
         layout.addWidget(self.end_button)
+
+        self.random_pos_button.clicked.connect(self.random_pos)
+        self.pos_button.clicked.connect(self.select_pos)
+        self.end_button.clicked.connect(self.select_end)
+
+
+    def random_pos(self):
+        self.randomStart.emit()
+
+    def select_pos(self):
+        self.selectStart.emit()
+
+    def select_end(self):
+        self.selectEnd.emit()
 
 
 class VueSecondApp(QMainWindow):
