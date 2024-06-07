@@ -53,6 +53,7 @@ class Image(QLabel):
         self.setPixmap(self.pixmap)
 
     def draw_grid(self, grid:list, x:int, y:int, case_size:int):
+        print(self.pixmap)
         if grid:
             width = len(grid[0])
         else:
