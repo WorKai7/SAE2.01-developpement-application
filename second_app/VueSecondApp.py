@@ -49,6 +49,7 @@ class Image(QLabel):
         self.setPixmap(self.pixmap)
 
     def draw_grid(self, grid:list, x:int, y:int, case_size:int):
+        print(self.pixmap)
         if grid:
             width = len(grid[0])
         else:
@@ -134,6 +135,9 @@ class MainWidget(QWidget):
 
 
 class Left(QWidget):
+
+    generateClicked = pyqtSignal()
+
     def __init__(self):
         super().__init__()
 
@@ -151,6 +155,12 @@ class Left(QWidget):
         layout.addWidget(self.buttons)
         layout.addSpacing(10)
         layout.addWidget(self.way_button)
+
+        self.way_button.clicked.connect(self.generate)
+
+
+    def generate(self):
+        self.generateClicked.emit()
 
 
 class Selection(QWidget):

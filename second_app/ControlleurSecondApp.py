@@ -3,6 +3,7 @@ from random import randint
 from PyQt6.QtWidgets import QApplication
 from VueSecondApp import VueSecondApp
 from ModeleSecondApp import ModeleSecondApp
+import copy
 
 class Controller():
     def __init__(self):
@@ -16,6 +17,7 @@ class Controller():
         self.vue.mainWidget.left.buttons.randomStart.connect(self.select_random_pos)
         self.vue.mainWidget.left.buttons.selectStart.connect(self.select_start)
         self.vue.mainWidget.left.buttons.selectEnd.connect(self.select_end)
+        self.vue.mainWidget.left.generateClicked.connect(self.generateAllPaths)
 
 
     def add_article(self):
@@ -65,6 +67,29 @@ class Controller():
         if self.modele.current_position:
             self.vue.mainWidget.image.draw_rect(self.modele.current_position, self.modele.current_infos["x"], self.modele.current_infos["y"], self.modele.current_infos["case_size"], (0, 0, 255))
 
+    def generateAllPaths(self):
+        final_path = []
+        position = self.modele.current_position
+        liste_course = copy.deepcopy(self.modele.product_list)
+        for i in range(len(liste_course)):
+            path_list=  []
+            for produit in liste_course:
+                for colonne in self.modele.current_infos["grid"]:
+                    if produit in colonne:
+                        path_list.append([produit ,self.modele.generatePathToDestination(self.modele.current_infos["pattern"], position, colonne.index(produit)), colonne.index(produit)])
+            min_path = path_list[0][1]
+            min_produit = path_list[0][0]
+            min_position = path_list[0][2]
+            for produit, path, position in path_list:
+                if len(path) < len(min_path):
+                    min_path = path
+                    min_produit = produit
+                    min_position = position
+            final_path.append(min_path)
+            position = min_position
+            liste_course.remove(min_produit)
+
+        return final_path
 
 
 if __name__ == "__main__":
