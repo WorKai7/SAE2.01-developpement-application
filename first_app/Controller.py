@@ -70,10 +70,13 @@ class Controller:
         """
             Supprime le projet actuellement chargé
         """
+
+        # Message de prévention
         msgBox = QMessageBox()
         reponse = msgBox.warning(self.vue, "Attention", "Voulez-vous vraiment supprimer le projet en cours ?",
                                   QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
 
+        # Suppression du projet et actualisation des informations
         if reponse == QMessageBox.StandardButton.Yes:
             if self.modele.current_infos["file_path"]:
                 os.remove(self.modele.current_infos["file_path"])
@@ -100,18 +103,22 @@ class Controller:
         """
         self.vue.setWindowTitle(self.modele.current_infos.get("project_name", ""))
 
+        # Actualisation de l'image
         self.vue.main_widget.right.grid.image = self.modele.current_infos["image"]
         self.vue.main_widget.right.grid.update_image()
 
+        # Actualisation des sliders
         self.vue.main_widget.right.w_slider.setMaximum(self.vue.main_widget.right.grid.pixmap.width())
         self.vue.main_widget.right.h_slider.setMaximum(self.vue.main_widget.right.grid.pixmap.height())
 
         self.vue.main_widget.right.w_slider.setValue(self.modele.current_infos["x"])
         self.vue.main_widget.right.h_slider.setValue(self.modele.current_infos["y"])
 
+        # Actualisation de la grille graphique
         self.vue.main_widget.right.grid.clear_grid()
         self.vue.main_widget.right.grid.draw_grid(self.modele.current_infos["grid"], self.modele.current_infos["case_size"])
 
+        # Actualisation des valeurs de lignes, colonnes et tailles de case (à gauche de la fenêtre)
         self.vue.main_widget.options.case_size.setValue(self.modele.current_infos["case_size"])
         self.vue.main_widget.options.row_number.setValue(len(self.modele.current_infos["grid"]))
         if self.modele.current_infos["grid"]:
@@ -147,9 +154,12 @@ class Controller:
             Keyword arguments:
             value -- nouvelle position (verticale ou horizontale)
         """
+
+        # Récupération du messager
         sender = self.vue.sender()
         self.vue.main_widget.right.grid.clear_grid()
 
+        # Actualisation des coordonnées
         if sender.property("type") == "x":
             self.vue.main_widget.right.grid.x = value
             self.modele.current_infos["x"] = value
@@ -182,6 +192,7 @@ class Controller:
         """
         if self.popup.x < len(self.modele.current_infos["grid"][0]) and self.popup.y < len(self.modele.current_infos["grid"]):
 
+            # Construction de la grille avec les articles dedans
             if self.popup.left.products.currentItem():
                 self.modele.current_infos["grid"][self.popup.y][self.popup.x] = [self.popup.left.categories.currentText(), self.popup.left.products.currentItem().text()]
             else:
@@ -189,6 +200,9 @@ class Controller:
 
             for info in self.popup.right.rect_infos:
 
+                # Construction du graphe avec les murs
+
+                # Ajout des voisins (suppression des murs) pour les rectangles verts
                 if info[1] == "green":
                     if info[0] == "left":
                         self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)][(self.popup.y, self.popup.x-1)] = 1
@@ -203,6 +217,7 @@ class Controller:
                         self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)][(self.popup.y-1, self.popup.x)] = 1
                         self.modele.current_infos["pattern"][(self.popup.y-1, self.popup.x)][(self.popup.y, self.popup.x)] = 1
 
+                # Suppression des voisins (ajout des murs) pour les rectangles rouges
                 elif info[1] == "red":
                     if info[0] == "left":
                         if (self.popup.y, self.popup.x-1) in self.modele.current_infos["pattern"][(self.popup.y, self.popup.x)].keys():

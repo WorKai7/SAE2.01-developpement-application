@@ -1,8 +1,6 @@
-import json
+import json, copy
 from PyQt6.QtWidgets import QFileDialog
-import random
 from pile import Pile
-import copy
 
 class ModeleSecondApp:
 
@@ -72,7 +70,7 @@ class ModeleSecondApp:
 
     def parcours(self, dico_graphe:dict, depart:tuple, arrivee:tuple):
         """
-            Vieux parcours en profodeur tout nul
+            Vieux parcours en profodeur tout nul (manque de temps pour implémenter un truc bien comme un a star par exemple)
         """
         p1:Pile = Pile()
         p1.empiler(depart)
@@ -91,36 +89,6 @@ class ModeleSecondApp:
                 return []
 
         return parcours
-
-    # def generatePathToDestination(self, dico_graphe: dict, depart: tuple, arrivee: tuple):
-    #     '''La fonction effectue un parcours en profondeur et retourne un chemin entre le départ & l'arrivée'''
-
-    #     assert isinstance(dico_graphe, dict), "L'argument utilisé n'est pas conforme : type dict() attendu."   # vérification de l'argument
-
-    #     voisins = Pile(1000)
-    #     voisins.empiler(depart)
-    #     parcours = []
-    #     liste_parcours = []
-    #     while voisins.est_vide() == False:
-    #         sommet = voisins.depiler()
-    #         parcours.append(sommet)
-    #         if sommet == arrivee:
-    #             parcours2 = copy.deepcopy(parcours)
-    #             liste_parcours.append(parcours2)
-
-    #         for voisin in dico_graphe[sommet].keys():
-    #             if (voisin not in parcours):
-    #                 voisins.empiler(voisin)
-    #             elif len(dico_graphe[sommet].keys()) == 1 and voisin in parcours and sommet != arrivee:
-    #                 old_sommet = parcours[parcours.index(sommet)-1]
-    #                 parcours.remove(sommet)
-    #                 sommet = old_sommet
-    #                 while len(dico_graphe[sommet].keys()) == 2:
-    #                     old_sommet = parcours[parcours.index(old_sommet)-1]
-    #                     parcours.remove(sommet)
-    #                     sommet = old_sommet
-
-    #     return liste_parcours
 
     def open_project(self):
         """

@@ -1,10 +1,10 @@
-import sys
+import sys, json
 from random import randint
 from PyQt6.QtWidgets import QApplication
 from VueSecondApp import VueSecondApp
 from ModeleSecondApp import ModeleSecondApp
 from Popup import Popup
-import json
+from ProjectInfos import ProjectInfos
 
 class Controller():
     def __init__(self):
@@ -12,6 +12,7 @@ class Controller():
         self.vue = VueSecondApp()
         self.modele = ModeleSecondApp()
         self.popup = None
+        self.project_infos = None
 
         self.vue.loadClicked.connect(self.open_project)
         self.vue.mainWidget.left.up.selection.addClicked.connect(self.add_article)
@@ -25,7 +26,8 @@ class Controller():
         self.vue.mainWidget.left.eraseClicked.connect(self.update_vue)
         self.vue.mainWidget.left.up.selection.updateList.connect(self.update_list)
         self.vue.mainWidget.left.buttons.infoClicked.connect(self.set_info_mode)
-        self.vue.mainWidget.image.rectClicked.connect(self.show_info)
+        self.vue.mainWidget.image.rectClicked.connect(self.show_product_info)
+        self.vue.infosClicked.connect(self.show_project_info)
 
 
     def add_article(self):
@@ -149,13 +151,23 @@ class Controller():
             self.update_vue()
             self.vue.mainWidget.left.label.hide()
 
-    def show_info(self, coordinates:tuple):
+    def show_product_info(self, coordinates:tuple):
+        """
+            Affiche une fenêtre d'information sur le produit aux coordonnées données
+
+            Keyword arguments:
+            coordinates -- les coordonnees de la case cliquée
+        """
         try:
             if self.modele.current_infos["grid"][coordinates[0]][coordinates[1]]:
                 self.popup = Popup(coordinates, self.modele.current_infos["grid"][coordinates[0]][coordinates[1]][1])
                 self.popup.show()
         except:
             pass
+
+    def show_project_info(self):
+        self.project_infos = ProjectInfos(self.modele.current_infos)
+        self.project_infos.show()
 
 
     def update_vue(self):
@@ -164,12 +176,15 @@ class Controller():
         """
         self.vue.setWindowTitle("StorePathFinder - " + self.modele.current_infos["project_name"])
 
+        # Actualisation de l'image du plan
         self.vue.mainWidget.image.image = self.modele.current_infos["image"]
         self.vue.mainWidget.image.update_image()
 
+        # Actualisation de la grille
         self.vue.mainWidget.image.draw_grid(self.modele.current_infos["grid"], self.modele.current_infos["x"],
                                             self.modele.current_infos["y"], self.modele.current_infos["case_size"])
 
+        # Actualisation des cases d'entrée et de sortie
         if not self.modele.current_position or not self.modele.destination:
             for i in range(len(self.modele.current_infos["grid"])):
                 for j in range(len(self.modele.current_infos["grid"][i])):
@@ -183,6 +198,7 @@ class Controller():
                                 self.modele.destination = (i, j)
                                 self.modele.current_infos["grid"][i][j] = None
 
+        # Actualisation du dessin des cases d'entrée et de sortie
         if self.modele.current_position:
             self.vue.mainWidget.image.draw_rect(self.modele.current_position, self.modele.current_infos["x"], self.modele.current_infos["y"],
                                                 self.modele.current_infos["case_size"], (0, 0, 255, 200))

@@ -81,7 +81,7 @@ class ModeleFirstApp:
 
     def create_grid(self, size:tuple):
         """
-            Cree la grille de taille voulue dans le modele
+            Cree la grille et le graphe de taille voulue dans le modele
             
             Keyword arguments:
             size -- Taille voulue de la grille
@@ -90,12 +90,19 @@ class ModeleFirstApp:
         pattern = {}
 
         for i in range(size[1]):
+
+            # Création d'une ligne
             row = []
+
             for j in range(size[0]):
+
+                # Ajout de tous les éléments dans la ligne
                 if self.saved_grid and i < len(self.saved_grid) and j < len(self.saved_grid[0]) and self.saved_grid[i][j]:
                     row.append(self.saved_grid[i][j])
                 else:
                     row.append(None)
+
+                # Création du graphe
                 sommet = (i, j)
                 pattern[sommet] = {}
 
@@ -110,30 +117,34 @@ class ModeleFirstApp:
 
             grille.append(row)
 
+        # Mise à jour des informations
         self.current_infos["grid"] = grille
         self.current_infos["pattern"] = pattern
 
 
     def convert_tuples_to_str(self):
         """
-            Convertis les tuples du pattern en chaines de caractere
+            Convertis les tuples du graphe en chaines de caractere
         """
         converted_pattern = {}
 
+        # Conversion
         for key, value in self.current_infos["pattern"].items():
             converted_pattern[str(key)] = {}
             for key2, value2 in value.items():
                 converted_pattern[str(key)][str(key2)] = value2
 
+        # Mise à jour
         self.current_infos["pattern"] = converted_pattern
 
 
     def convert_str_to_tuples(self):
         """
-            Converties les chaines de caractere du pattern en tuples
+            Convertis les chaines de caractere du graphe en tuples
         """
         converted_pattern = {}
 
+        # Conversion
         for key, value in self.current_infos["pattern"].items():
             first_value = ""
             i = 1
@@ -167,4 +178,5 @@ class ModeleFirstApp:
 
                 converted_pattern[(int(first_value), int(second_value))][(int(first_value2), int(second_value2))] = value2
 
+        # Mise à jour
         self.current_infos["pattern"] = converted_pattern

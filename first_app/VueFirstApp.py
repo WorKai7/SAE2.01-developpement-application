@@ -39,6 +39,7 @@ class VueFirstApp(QMainWindow):
         menu_edition.addAction("Charger un plan de magasin", self.load)
 
         menu_theme = menu_bar.addMenu("&Thèmes")
+        menu_theme.addAction("Clair", self.applyBrightTheme)
         menu_theme.addAction("Sombre", self.applyDarkTheme) 
         menu_theme.addAction("Material Dark", self.applyMaterialDark)
         menu_theme.addAction("Défaut", self.resetTheme)
@@ -228,6 +229,7 @@ class Grid(QLabel):
         if self.pixmap.height() >= 800:
             self.pixmap = QPixmap(self.image).scaledToHeight(800)
 
+        # Copie du pixmap pour ne pas le recalculer a chaque fois
         self.blank_pixmap = self.pixmap
 
         self.setPixmap(self.pixmap)
@@ -241,21 +243,31 @@ class Grid(QLabel):
             grid -- les informations de la grille (nombre de cases et colonnes)
             case_size -- la taille de chaque case
         """
+
+        # Determination des dimensions de la grille
         if grid:
             width = len(grid[0])
         else:
             width = 0
 
         height = len(grid)
+
+        # Initialisation du dessin
         pixmap = self.blank_pixmap.copy()
         painter = QPainter(pixmap)
 
         for i in range(height):
+
+            # Création d'une ligne
             row = []
+
             for j in range(width):
+
+                # Initialisation des cases
                 case = QRect(j*case_size+self.x, i*case_size+self.y, case_size, case_size)
                 row.append(case)
 
+                # Dessin des cases
                 if grid[i][j]:
                     painter.setBrush(QColor(0, 0, 0, 128))
                     painter.drawRect(case)
@@ -264,6 +276,8 @@ class Grid(QLabel):
                     painter.drawRect(case)
 
             self.grid.append(row)
+
+        # Mise à jour du dessin
         self.setPixmap(pixmap)
         painter.end()
 
@@ -275,6 +289,7 @@ class Grid(QLabel):
     def mousePressEvent(self, event):
         """
             Traite le click sur la grille et envoie l'evenement avec les bonnes valeurs
+            pour afficher la popup de modification de la grille et du graphe
         """
         if event.button() == Qt.MouseButton.LeftButton:
             for i in range(len(self.grid)):
@@ -297,6 +312,15 @@ class Options(QWidget):
         font18 = QFont()
         font18.setPointSize(18)
 
+        font14 = QFont()
+        font14.setPointSize(14)
+
+        self.info_label1 = QLabel("Créez votre projet, importez votre plan, construisez votre grille")
+        self.info_label2 = QLabel("avec les outils ci-dessous puis ajoutez vos produits et définissez")
+        self.info_label3 = QLabel("vos murs en cliquant sur les cases de votre grille")
+        self.info_label1.setFont(font14)
+        self.info_label2.setFont(font14)
+        self.info_label3.setFont(font14)
         self.row_label = QLabel("Nombre de lignes")
         self.row_label.setFont(font18)
         self.row_number = QSpinBox()
@@ -321,6 +345,10 @@ class Options(QWidget):
         self.clear_grid_button.setFixedSize(200, 50)
         self.clear_grid_button.setFont(font18)
 
+        layout.addWidget(self.info_label1, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.info_label2, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.info_label3, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addSpacing(35)
         layout.addWidget(self.row_label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.row_number, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addSpacing(25)

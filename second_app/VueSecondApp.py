@@ -1,32 +1,9 @@
-import sys, time
-from PyQt6.QtWidgets import QApplication, QMainWindow, QToolBar, QStatusBar, \
-                            QLabel, QTextEdit, QFileDialog, QDockWidget, QVBoxLayout, \
+import sys
+from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, \
                             QHBoxLayout, QComboBox, QWidget, QPushButton, QAbstractItemView, \
                             QListWidget
-from PyQt6.QtGui import QIcon, QAction, QPixmap, QPainter, QColor
+from PyQt6.QtGui import QPixmap, QPainter, QColor
 from PyQt6.QtCore import Qt, pyqtSignal, QRect
-
-
-class ProjectInfos(QWidget):
-    def __init__(self, infos: dict):
-        super().__init__()
-        self.projectInfos = infos
-
-        self.author = QLabel(self.projectInfos['project_author'])
-        self.project_name = QLabel(self.projectInfos["project_name"])
-        self.shop_name = QLabel("shop_name")
-        self.shop_address = QLabel(self.projectInfos["shop_address"])
-
-        self.main_layout = QVBoxLayout()
-        self.setLayout(self.main_layout)
-
-        self.main_layout.addWidget(self.author)
-        self.main_layout.addWidget(self.project_name)
-        self.main_layout.addWidget(self.shop_name)
-        self.main_layout.addWidget(self.shop_address)
-
-        self.show()
-
 
 class Image(QLabel):
 
@@ -71,20 +48,31 @@ class Image(QLabel):
             y -- L'ordonnee a laquelle doit commencer la grille
             case_size -- La taille de chaque case
         """
+
+        # Determination des dimensions de la grille
         if grid:
             width = len(grid[0])
         else:
             width = 0
 
         height = len(grid)
+
+
+        # Initialisation du dessin
         painter = QPainter(self.pixmap)
 
         for i in range(height):
+
+            # Création d'une ligne
             row = []
+
             for j in range(width):
+
+                # Initialisation des cases
                 case = QRect(j*case_size+x, i*case_size+y, case_size, case_size)
                 row.append(case)
 
+                # Dessin des cases
                 if grid[i][j]:
                     painter.setBrush(QColor(0, 0, 0, 128))
                     painter.drawRect(case)
@@ -93,6 +81,8 @@ class Image(QLabel):
                     painter.drawRect(case)
 
             self.grid.append(row)
+
+        # Mise à jour du dessin
         self.setPixmap(self.pixmap)
         painter.end()
 
@@ -134,6 +124,11 @@ class Image(QLabel):
         """
             Emet un click event avec les bonnes valeurs
         """
+
+        # Gère les clics sur la grille: trois types de clics possibles:
+        # - Selection de la position de départ
+        # - Sélection de la position d'arrivée
+        # - Sélection d'une case pour voir le produit à l'intérieur
         if self.selecting_start or self.selecting_end or self.info_mode:
             if event.button() == Qt.MouseButton.LeftButton:
                 for i in range(len(self.grid)):
@@ -371,44 +366,90 @@ class VueSecondApp(QMainWindow):
         menu_fichier.addSeparator()
         menu_nav.addAction('Générer chemin', self.getPathToProduct)
 
+        menu_theme = menu_bar.addMenu("&Thèmes")
+        menu_theme.addAction("Clair", self.applyBrightTheme)
+        menu_theme.addAction("Sombre", self.applyDarkTheme)
+        menu_theme.addAction("Material Dark", self.applyMaterialDark)
+        menu_theme.addAction("Défaut", self.resetTheme)
+
         self.mainWidget = MainWidget()
         self.setCentralWidget(self.mainWidget)
 
         self.show()
 
 
+    def applyBrightTheme(self):
+        """
+            Bascule vers le theme clair
+        """
+
+        fichier_style = open("../fichiers_qss/lightstyle.qss", 'r')
+        with fichier_style:
+            qss = fichier_style.read()
+            self.setStyleSheet(qss)
+
+
+    def applyDarkTheme(self):
+        """
+            Bascule vers le theme sombre
+        """
+
+        fichier_style = open("../fichiers_qss/darkstyle.qss", 'r')
+        with fichier_style:
+            qss = fichier_style.read()
+            self.setStyleSheet(qss)
+
+
+    def applyMaterialDark(self):
+        """
+            Bascule vers le theme Material Dark
+        """
+
+        fichier_style = open("../fichiers_qss/materialdark.qss", 'r')
+        with fichier_style:
+            qss = fichier_style.read()
+            self.setStyleSheet(qss)
+
+    def resetTheme(self):
+        """
+            Bascule sur le theme par defaut du systeme
+        """
+        self.setStyleSheet('')
+
+
     def getPathToProduct(self):
-        self.mainWidget.generatePath()
+        """
+            Emet le signal pour génerer et afficher le chemin
+        """
+        self.mainWidget.left.generateClicked.emit()
 
 
     def setPos(self):
-        self.mainWidget.setLocation()
+        """
+            Emet le signal pour sélectionner la position de départ
+        """
+        self.mainWidget.left.buttons.selectStart.emit()
 
 
     def setGoal(self):
-        self.mainWidget.destinationPicked()
-
-
-    def updatePlan(self, image_path = None):
-        self.new_product_list = QComboBox()
-        self.mainWidget.main_layout.replaceWidget(self.mainWidget.product_list, self.new_product_list)
-        self.mainWidget.getProductList()
-        self.mainWidget.main_layout.removeWidget(self.mainWidget.image)
-        self.mainWidget.showPlan(image_path)
+        """
+            Emet le signal pour sélectionner la position d'arrivée
+        """
+        self.mainWidget.left.buttons.selectEnd.emit()
 
 
     def setProject(self):
+        """
+            Emet le signal pour ouvrir un nouveau projet
+        """
         self.loadClicked.emit()
 
 
     def viewInfos(self):
+        """
+            Emet le signal pour afficher les informations du projet ouvert
+        """
         self.infosClicked.emit()
-
-
-    def updateInfos(self, infos: dict):
-        self.project_infos = infos
-        self.__imagePath = self.project_infos["image"]
-        self.updatePlan(self.__imagePath)
 
 
 ## -----------------------------------------------------------------------------

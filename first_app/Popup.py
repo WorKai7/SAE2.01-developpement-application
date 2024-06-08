@@ -1,7 +1,6 @@
-import sys
 import json
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QComboBox, QListWidget, QAbstractItemView, QApplication, QLabel, QPushButton
-from PyQt6.QtGui import QMouseEvent, QPixmap, QPainter, QBrush, QColor
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QComboBox, QListWidget, QAbstractItemView, QLabel, QPushButton
+from PyQt6.QtGui import QPixmap, QPainter, QBrush, QColor
 from PyQt6.QtCore import QRect, Qt, pyqtSignal
 
 
@@ -15,6 +14,7 @@ class Popup(QWidget):
         self.x = coordinates[1]
         self.y = coordinates[0]
 
+        # Récupération de la liste des produits
         if product_infos:
             self.category = product_infos[0]
             self.product = product_infos[1]
@@ -32,6 +32,7 @@ class Popup(QWidget):
         self.right = Right(coordinates, pattern)
         self.left = Left()
 
+        # Mise à jour des produits et de la catégorie
         if self.category:
             self.left.categories.setCurrentText(self.category)
 
@@ -90,7 +91,7 @@ class Popup(QWidget):
         self.left.products.setCurrentItem(None)
 
 
-    def closeEvent(self):
+    def closeEvent(self, event):
         """
             Ferme la fenetre
         """
@@ -152,6 +153,10 @@ class Right(QLabel):
         max_bottom = max([key[0] for key in pattern.keys()])
 
         self.painter = QPainter(self.schema)
+
+        # Dessin de la partie droite : la croix de cases vertes ou rouges
+
+        # Dessin de la case du haut
         if coordinates[0] > 0:
             rect = QRect(150, 50, 100, 100)
             self.rect_list.append(rect)
@@ -165,6 +170,8 @@ class Right(QLabel):
 
             self.painter.drawRect(rect)
 
+
+        # Dessin de la case de gauche
         if coordinates[1] > 0:
             rect = QRect(50, 150, 100, 100)
             self.rect_list.append(rect)
@@ -178,10 +185,14 @@ class Right(QLabel):
 
             self.painter.drawRect(rect)
 
+
+        # Dessin de la case du milieu
         mid_rect = QRect(150, 150, 100, 100)
         self.rect_list.append(mid_rect)
         self.rect_infos.append(["current", "black"])
 
+
+        # Dessin de la case droite
         if coordinates[1] < max_right:
             rect = QRect(250, 150, 100, 100)
             self.rect_list.append(rect)
@@ -195,6 +206,8 @@ class Right(QLabel):
 
             self.painter.drawRect(rect)
 
+
+        # Dessin de la case du bas
         if coordinates[0] < max_bottom:
             rect = QRect(150, 250, 100, 100)
             self.rect_list.append(rect)
@@ -216,10 +229,11 @@ class Right(QLabel):
 
     def mousePressEvent(self, event):
         """
-            Appelee lorsque la grille est cliquee afin de traiter le click
+            Appele lorsque la grille est cliquee afin de traiter le click
         """
         for i in range(len(self.rect_list)):
 
+            # On change le rectangle de couleur quand on clique sur une case
             if self.rect_list[i].contains(event.pos()):
                 if self.rect_infos[i][1] == "green":
                     self.painter.setBrush(QColor(Qt.GlobalColor.red))

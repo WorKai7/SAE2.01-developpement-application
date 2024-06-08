@@ -1041,6 +1041,7 @@
             null,
             null,
             null,
+            null,
             [
                 "Entr\u00e9e/Sortie",
                 "Sortie"
@@ -1068,7 +1069,6 @@
             null,
             null,
             null,
-            null,
             null
         ],
         [
@@ -1096,6 +1096,21 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ],
+        [
             null,
             null,
             null,
@@ -1107,21 +1122,6 @@
                 "Entr\u00e9e/Sortie",
                 "Entr\u00e9e"
             ],
-            null,
-            null,
-            null,
-            null,
-            null
-        ],
-        [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
             null,
             null,
             null,

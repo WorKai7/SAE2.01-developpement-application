@@ -29,7 +29,7 @@ class NewProjectApp(QWidget):
 
         layout = QVBoxLayout() ; self.setLayout(layout)
 
-        self.setStyleSheet("QWidget{ background-color: white; }  QLabel{ font-size: 18px; } QLineEdit { border: 2px solid; border-radius: 8px; padding-left: 10px; height: 20px }") # commun a tous les éléments de la page
+        self.setStyleSheet("QWidget{ background-color: white; }  QLabel{ font-size: 18px; color: black; } QLineEdit { border: 2px solid; border-radius: 8px; padding-left: 10px; height: 20px } QPushButton{ color: black; }") # commun a tous les éléments de la page
 
         self.project_name_label = QLabel("Nom du projet:")
         self.project_name = Champ("Ex: Projet 1")
