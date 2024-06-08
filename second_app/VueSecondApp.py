@@ -32,6 +32,7 @@ class Image(QLabel):
 
     startClicked = pyqtSignal(tuple)
     endClicked = pyqtSignal(tuple)
+    rectClicked = pyqtSignal(tuple)
 
     def __init__(self, chemin: str):
         super().__init__()
@@ -42,6 +43,7 @@ class Image(QLabel):
         self.grid = []
         self.selecting_start = False
         self.selecting_end = False
+        self.info_mode = False
 
 
     def update_image(self):
@@ -132,18 +134,20 @@ class Image(QLabel):
         """
             Emet un click event avec les bonnes valeurs
         """
-        if self.selecting_start or self.selecting_end:
+        if self.selecting_start or self.selecting_end or self.info_mode:
             if event.button() == Qt.MouseButton.LeftButton:
                 for i in range(len(self.grid)):
                     for j in range(len(self.grid[i])):
                         rect = self.grid[i][j]
                         if rect.contains(event.pos()):
-                            if self.selecting_start:
+                            if self.selecting_start and not self.info_mode:
                                 self.startClicked.emit((i, j))
                                 self.selecting_start = False
-                            elif self.selecting_end:
+                            elif self.selecting_end and not self.info_mode:
                                 self.endClicked.emit((i, j))
                                 self.selecting_end = False
+                            elif self.info_mode:
+                                self.rectClicked.emit((i, j))
 
 
 class MainWidget(QWidget):
@@ -173,7 +177,9 @@ class Left(QWidget):
 
         self.up = Up()
         self.label = QLabel("Sélectionnez une case en cliquant dans la grille")
+        self.info_label = QLabel("Vous êtes en mode informations : cliquez sur une case pour voir son produit associé")
         self.label.hide()
+        self.info_label.hide()
         self.buttons = Buttons()
         self.way_button = QPushButton("Génerer le chemin")
         self.erase_way_button = QPushButton("Effacer le chemin")
@@ -181,6 +187,7 @@ class Left(QWidget):
         layout.addWidget(self.up)
         layout.addSpacing(10)
         layout.addWidget(self.label)
+        layout.addWidget(self.info_label)
         layout.addWidget(self.buttons)
         layout.addSpacing(10)
         layout.addWidget(self.way_button)
@@ -291,23 +298,27 @@ class Buttons(QWidget):
     randomStart = pyqtSignal()
     selectStart = pyqtSignal()
     selectEnd = pyqtSignal()
+    infoClicked = pyqtSignal()
 
     def __init__(self):
         super().__init__()
 
         layout = QHBoxLayout() ; self.setLayout(layout)
 
-        self.random_pos_button = QPushButton("Sélectionner une position de départ aléatoire")
-        self.pos_button = QPushButton("Sélectionner la position de départ")
-        self.end_button = QPushButton("Sélectionner la position d'arrivée")
+        self.random_pos_button = QPushButton("Position de départ aléatoire")
+        self.pos_button = QPushButton("Sélectionner le départ")
+        self.end_button = QPushButton("Sélectionner l'arrivée")
+        self.info_button = QPushButton("Activer/Désactiver le mode informations")
 
         layout.addWidget(self.random_pos_button)
         layout.addWidget(self.pos_button)
         layout.addWidget(self.end_button)
+        layout.addWidget(self.info_button)
 
         self.random_pos_button.clicked.connect(self.random_pos)
         self.pos_button.clicked.connect(self.select_pos)
         self.end_button.clicked.connect(self.select_end)
+        self.info_button.clicked.connect(self.info_mode)
 
 
     def random_pos(self):
@@ -327,6 +338,12 @@ class Buttons(QWidget):
             Emet l'evenement de click sur le bouton selection de sortie
         """
         self.selectEnd.emit()
+
+    def info_mode(self):
+        """
+            Emet l'evenement de click sur le bouton de passage en mode info
+        """
+        self.infoClicked.emit()
 
 
 class VueSecondApp(QMainWindow):

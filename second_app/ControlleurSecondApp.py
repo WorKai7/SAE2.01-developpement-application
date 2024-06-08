@@ -3,6 +3,7 @@ from random import randint
 from PyQt6.QtWidgets import QApplication
 from VueSecondApp import VueSecondApp
 from ModeleSecondApp import ModeleSecondApp
+from Popup import Popup
 import json
 
 class Controller():
@@ -10,6 +11,7 @@ class Controller():
         
         self.vue = VueSecondApp()
         self.modele = ModeleSecondApp()
+        self.popup = None
 
         self.vue.loadClicked.connect(self.open_project)
         self.vue.mainWidget.left.up.selection.addClicked.connect(self.add_article)
@@ -22,6 +24,8 @@ class Controller():
         self.vue.mainWidget.left.generateClicked.connect(self.generate_path)
         self.vue.mainWidget.left.eraseClicked.connect(self.update_vue)
         self.vue.mainWidget.left.up.selection.updateList.connect(self.update_list)
+        self.vue.mainWidget.left.buttons.infoClicked.connect(self.set_info_mode)
+        self.vue.mainWidget.image.rectClicked.connect(self.show_info)
 
 
     def add_article(self):
@@ -109,6 +113,17 @@ class Controller():
         self.vue.mainWidget.image.selecting_end = True
         self.vue.mainWidget.left.label.show()
 
+    def set_info_mode(self):
+        """
+            Active le mode informations
+        """
+
+        if self.vue.mainWidget.image.info_mode:
+            self.vue.mainWidget.image.info_mode = False
+            self.vue.mainWidget.left.info_label.hide()
+        else:
+            self.vue.mainWidget.image.info_mode = True
+            self.vue.mainWidget.left.info_label.show()
 
     def select_start(self, coordinates:tuple):
         """
@@ -122,7 +137,6 @@ class Controller():
             self.update_vue()
             self.vue.mainWidget.left.label.hide()
 
-
     def select_end(self, coordinates:tuple):
         """
             Met a jour le modele en changeant la position d'arrivee
@@ -134,6 +148,14 @@ class Controller():
             self.modele.destination = coordinates
             self.update_vue()
             self.vue.mainWidget.left.label.hide()
+
+    def show_info(self, coordinates:tuple):
+        try:
+            if self.modele.current_infos["grid"][coordinates[0]][coordinates[1]]:
+                self.popup = Popup(coordinates, self.modele.current_infos["grid"][coordinates[0]][coordinates[1]][1])
+                self.popup.show()
+        except:
+            pass
 
 
     def update_vue(self):
