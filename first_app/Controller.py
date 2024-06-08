@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, copy
 from PyQt6.QtWidgets import QApplication, QMessageBox
 from VueFirstApp import VueFirstApp
 from ModeleFirstApp import ModeleFirstApp
@@ -136,6 +136,7 @@ class Controller:
             Supprime la grille actuelle
         """
         self.vue.main_widget.right.grid.clear_grid()
+        self.modele.saved_grid = copy.deepcopy(self.modele.current_infos["grid"])
         self.modele.current_infos["grid"].clear()
 
 

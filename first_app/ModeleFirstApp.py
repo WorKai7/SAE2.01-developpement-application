@@ -19,6 +19,8 @@ class ModeleFirstApp:
             "pattern": {}
         }
 
+        self.saved_grid = []
+
 
     def save(self):
         """
@@ -90,7 +92,10 @@ class ModeleFirstApp:
         for i in range(size[1]):
             row = []
             for j in range(size[0]):
-                row.append(None)
+                if self.saved_grid and i < len(self.saved_grid) and j < len(self.saved_grid[0]) and self.saved_grid[i][j]:
+                    row.append(self.saved_grid[i][j])
+                else:
+                    row.append(None)
                 sommet = (i, j)
                 pattern[sommet] = {}
 

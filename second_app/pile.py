@@ -22,7 +22,10 @@ class Pile():
             Supprile l'element au sommet de la pile et le renvoie
         """
         self.nb_elements -= 1
-        return self.elements.pop(self.nb_elements)
+        if self.elements:
+            return self.elements.pop(self.nb_elements)
+        else:
+            return None
 
 
     def contient(self, element):
