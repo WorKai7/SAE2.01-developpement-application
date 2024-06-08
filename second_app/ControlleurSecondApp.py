@@ -25,6 +25,9 @@ class Controller():
 
 
     def add_article(self):
+        """
+            Ajoute un article
+        """
         item = self.vue.mainWidget.left.up.selection.products.currentItem()
         if item:
             if item.text() not in self.modele.product_list:
@@ -33,6 +36,9 @@ class Controller():
 
 
     def delete_article(self):
+        """
+            Supprime un article    
+        """
         item = self.vue.mainWidget.left.up.liste.liste.currentItem()
         if item:
             self.modele.product_list.remove(item.text())
@@ -41,11 +47,21 @@ class Controller():
 
 
     def update_list(self):
+        """
+            Modifie la liste d'articles en fonction de la categorie selectionnee
+        """
         products = self.get_products(self.vue.mainWidget.left.up.selection.categories.currentText())
         self.vue.mainWidget.left.up.selection.products.clear()
         self.vue.mainWidget.left.up.selection.products.addItems(products)
 
+
     def get_products(self, category:str):
+        """
+            Obtient la liste de produits de la categorie choisie, a partir du fichier liste de produits
+
+            Keyword arguments:
+            category -- La categorie dont on doit recuperer les produits
+        """
         liste = []
         with open("../Liste de produits-20240513/liste_produits.json", encoding="utf-8") as f:
             products = json.load(f)
@@ -61,27 +77,46 @@ class Controller():
 
 
     def open_project(self):
+        """
+            Ouvre un nouveau projet en lancant la selection du fichier en appelant la foction correspondante du modele
+            et en mettant la vue a jour
+        """
         self.modele.open_project()
         self.update_vue()
 
 
     def select_random_pos(self):
+        """
+            Choisi une position aleatoire dans la grille
+        """
         if self.modele.current_infos["grid"]:
             self.modele.current_position = (randint(1, len(self.modele.current_infos["grid"]))-1, randint(1, len(self.modele.current_infos["grid"][0]))-1)
             self.update_vue()
 
 
     def set_select_start(self):
+        """
+            Active la selection de la position de depart
+        """
         self.vue.mainWidget.image.selecting_start = True
         self.vue.mainWidget.left.label.show()
 
 
     def set_select_end(self):
+        """
+            Active la selection de la position d'arrivee
+        """
         self.vue.mainWidget.image.selecting_end = True
         self.vue.mainWidget.left.label.show()
 
 
     def select_start(self, coordinates:tuple):
+        """
+            Met a jour le modele en changeant la position de depart
+
+            Keyword arguments:
+            coordinates -- les coordonnes de la nouvelle position
+        """
         if self.modele.current_infos["grid"]:
             self.modele.current_position = coordinates
             self.update_vue()
@@ -89,6 +124,12 @@ class Controller():
 
 
     def select_end(self, coordinates:tuple):
+        """
+            Met a jour le modele en changeant la position d'arrivee
+
+            Keyword arguments:
+            coordinates -- les coordonnes de la nouvelle position
+        """
         if self.modele.current_infos["grid"]:
             self.modele.destination = coordinates
             self.update_vue()
@@ -96,6 +137,9 @@ class Controller():
 
 
     def update_vue(self):
+        """
+            Met a jour la vue a partir des informations du modele
+        """
         self.vue.setWindowTitle("StorePathFinder - " + self.modele.current_infos["project_name"])
 
         self.vue.mainWidget.image.image = self.modele.current_infos["image"]
@@ -127,7 +171,11 @@ class Controller():
 
         self.update_list()
 
+
     def generate_path(self):
+        """
+            Genere le chemin
+        """
         path = self.modele.generateAllPaths()
 
         if path:
@@ -137,9 +185,6 @@ class Controller():
 
 
 if __name__ == "__main__":
-
     app = QApplication(sys.argv)
-
     fenetre = Controller()
-
     sys.exit(app.exec())

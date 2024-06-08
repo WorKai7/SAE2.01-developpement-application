@@ -1,6 +1,7 @@
 import json
 from PyQt6.QtWidgets import QFileDialog
 
+
 class ModeleFirstApp:
 
     def __init__(self) -> None:
@@ -21,8 +22,10 @@ class ModeleFirstApp:
         self.saved_grid = []
 
 
-
     def save(self):
+        """
+            Sauvegarde les informations dans le fichier JSON du projet en cours
+        """
         if not self.current_infos["file_path"]:
             self.save_as()
         else:
@@ -33,6 +36,9 @@ class ModeleFirstApp:
 
 
     def save_as(self):
+        """
+            Demande a l'utilisateur la cr"ation d'un fichier JSON pour le projet et le sauvegarde dedans
+        """
         path = QFileDialog.getSaveFileName(caption="Enregistrer sous", directory="../projets", filter="Projet JSON")[0] + ".json"
 
         if path:
@@ -45,7 +51,11 @@ class ModeleFirstApp:
                 json.dump(self.current_infos, f, indent=4)
                 self.convert_str_to_tuples()
 
+
     def open(self):
+        """
+            Ouvre le projet selectionne par l'utilisateur
+        """
         path = QFileDialog.getOpenFileName(caption="Choisissez un projet", directory="../projets", filter="Projet JSON (*.json)")[0]
 
         if path:
@@ -58,6 +68,9 @@ class ModeleFirstApp:
 
 
     def load_image(self):
+        """
+            Charge dans le projet l'image choisie par l'utilisateur
+        """
         image = QFileDialog.getOpenFileName(caption="Sélectionner un plan", directory="../images", filter="*.png *.jpg *.jpeg *.svg")[0]
 
         if image:
@@ -67,6 +80,12 @@ class ModeleFirstApp:
 
 
     def create_grid(self, size:tuple):
+        """
+            Cree la grille de taille voulue dans le modele
+            
+            Keyword arguments:
+            size -- Taille voulue de la grille
+        """
         grille = []
         pattern = {}
 
@@ -94,7 +113,11 @@ class ModeleFirstApp:
         self.current_infos["grid"] = grille
         self.current_infos["pattern"] = pattern
 
+
     def convert_tuples_to_str(self):
+        """
+            Convertis les tuples du pattern en chaines de caractere
+        """
         converted_pattern = {}
 
         for key, value in self.current_infos["pattern"].items():
@@ -104,7 +127,11 @@ class ModeleFirstApp:
 
         self.current_infos["pattern"] = converted_pattern
 
+
     def convert_str_to_tuples(self):
+        """
+            Converties les chaines de caractere du pattern en tuples
+        """
         converted_pattern = {}
 
         for key, value in self.current_infos["pattern"].items():

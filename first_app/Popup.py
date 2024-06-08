@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QComboBox, QListW
 from PyQt6.QtGui import QMouseEvent, QPixmap, QPainter, QBrush, QColor
 from PyQt6.QtCore import QRect, Qt, pyqtSignal
 
+
 class Popup(QWidget):
 
     confirmClicked = pyqtSignal()
@@ -65,18 +66,34 @@ class Popup(QWidget):
 
 
     def update_label(self):
+        """
+            Modifie le label de selection de produit pour qu'il corresponde au produit actuellement
+            selectionne par l'utilisareur
+        """
         if self.left.products.currentItem():
             self.ajout.setText("Article : " + self.left.products.currentItem().text())
         else:
             self.ajout.setText("Article: Aucun")
 
+
     def confirm(self):
+        """
+            envoie le signal de confirmation de modification de la case
+        """
         self.confirmClicked.emit()
 
+
     def delete(self):
+        """
+            Supprime le produit actuellement selectionne par l'utilisateur
+        """
         self.left.products.setCurrentItem(None)
 
-    def closeEvent(self, event):
+
+    def closeEvent(self):
+        """
+            Ferme la fenetre
+        """
         self.right.painter.end()
         self.close()
 
@@ -99,12 +116,23 @@ class Left(QWidget):
         layout.addWidget(self.categories)
         layout.addWidget(self.products)
 
+
     def update_product_list(self):
+        """
+            Met a jour la liste de produits en fonction de la categorie selectionnee
+        """
         products = self.get_products(self.categories.currentText())
         self.products.clear()
         self.products.addItems(products)
 
+
     def get_products(self, category:str):
+        """
+            Recupere les produits de la categorie choisie dans le fichier liste de produits
+
+            Keyword arguments:
+            category -- La categorie dont on recupere les produits
+        """
         products = []
         with open("../Liste de produits-20240513/liste_produits.json", encoding="utf-8") as f:
             products = json.load(f)
@@ -187,6 +215,9 @@ class Right(QLabel):
 
 
     def mousePressEvent(self, event):
+        """
+            Appelee lorsque la grille est cliquee afin de traiter le click
+        """
         for i in range(len(self.rect_list)):
 
             if self.rect_list[i].contains(event.pos()):
