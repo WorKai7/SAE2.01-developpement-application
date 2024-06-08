@@ -4,6 +4,7 @@ from VueFirstApp import VueFirstApp
 from ModeleFirstApp import ModeleFirstApp
 from NewProjectApp import NewProjectApp
 from Popup import Popup
+from authPopup import AuthPopup
 
 
 class Controller:
@@ -12,11 +13,34 @@ class Controller:
     """
     def __init__(self) -> None:
 
+        self.auth_popup = AuthPopup()
+        self.authenticated = False
+        self.passwd = "metteznous20svp"
+
+        self.auth_popup.cancelClickedEvent.connect(self.cancel)
+        self.auth_popup.confirmClickedEvent.connect(self.confirm)
+
+    
+    def cancel(self):
+        sys.exit()
+
+
+    def confirm(self, passwd):
+        if passwd == self.passwd:
+            self.initialization()
+            self.auth_popup.close()
+        else:
+            print("Mot de passe incorrect ! Veuillez réessayer.")
+            self.auth_popup.passfield.clear()
+            
+
+    def initialization(self):
         # Composants de la fenêtre
         self.vue = VueFirstApp()
         self.modele = ModeleFirstApp()
         self.new_window = None
         self.popup = None
+
 
         # Signaux
         self.vue.newClicked.connect(self.new)
@@ -188,7 +212,7 @@ class Controller:
 
     def update_pattern(self):
         """
-            Modifie le pattern du modele a partir des informations de la pop-up
+            Modifie le graphe du modele a partir des informations de la pop-up
         """
         if self.popup.x < len(self.modele.current_infos["grid"][0]) and self.popup.y < len(self.modele.current_infos["grid"]):
 
@@ -243,6 +267,8 @@ class Controller:
 
         self.popup.close()
         self.update_vue()
+        if self.saved:
+            self.modele.save()
 
 
 if __name__ == "__main__":
