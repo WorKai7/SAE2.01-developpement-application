@@ -3,7 +3,6 @@ from random import randint
 from PyQt6.QtWidgets import QApplication
 from VueSecondApp import VueSecondApp
 from ModeleSecondApp import ModeleSecondApp
-from Popup import Popup
 import json
 
 class Controller():
@@ -11,7 +10,6 @@ class Controller():
         
         self.vue = VueSecondApp()
         self.modele = ModeleSecondApp()
-        self.popup = None
 
         self.vue.loadClicked.connect(self.open_project)
         self.vue.mainWidget.left.up.selection.addClicked.connect(self.add_article)

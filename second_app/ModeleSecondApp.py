@@ -117,10 +117,11 @@ class ModeleSecondApp:
     def open_project(self):
         path = QFileDialog.getOpenFileName(caption='Ouvrir plan', directory="../projets/", filter="Json Files (*.json)")[0]
 
-        with open(path, 'r') as f:
-            self.current_infos = json.load(f)
-            self.convert_str_to_tuples()
-            self.current_infos["file_path"] = path
+        if path:
+            with open(path, 'r') as f:
+                self.current_infos = json.load(f)
+                self.convert_str_to_tuples()
+                self.current_infos["file_path"] = path
 
     def convert_str_to_tuples(self):
         converted_pattern = {}
