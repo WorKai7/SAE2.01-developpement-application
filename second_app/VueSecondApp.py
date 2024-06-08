@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QToolBar, QStatusBar, \
 from PyQt6.QtGui import QIcon, QAction, QPixmap, QPainter, QColor
 from PyQt6.QtCore import Qt, pyqtSignal, QRect
 
+
 class ProjectInfos(QWidget):
     def __init__(self, infos: dict):
         super().__init__()
@@ -26,6 +27,7 @@ class ProjectInfos(QWidget):
 
         self.show()
 
+
 class Image(QLabel):
 
     startClicked = pyqtSignal(tuple)
@@ -41,7 +43,11 @@ class Image(QLabel):
         self.selecting_start = False
         self.selecting_end = False
 
+
     def update_image(self):
+        """
+            Modifie l'image actuellement affichee par la nouvelle image
+        """
         self.pixmap = QPixmap(self.image)
 
         if self.pixmap.width() >= 1100:
@@ -54,6 +60,15 @@ class Image(QLabel):
 
 
     def draw_grid(self, grid:list, x:int, y:int, case_size:int):
+        """
+            Dessine la grille selon les informations passees en parametre
+
+            Keyword arguments:
+            grid -- Les dimensions de la grille (verticale et horizontale)
+            x -- L'abcisse a laquelle doit commencer la grille
+            y -- L'ordonnee a laquelle doit commencer la grille
+            case_size -- La taille de chaque case
+        """
         if grid:
             width = len(grid[0])
         else:
@@ -81,6 +96,16 @@ class Image(QLabel):
 
 
     def draw_rect(self, pos:tuple, x:int, y:int, case_size:int, color:tuple):
+        """
+            Colore une case sur la grille
+
+            Keywrod arguments:
+            pos -- Les coordonnees de la case a colorer
+            x -- L'abcisse a partir de laquelle commencer la coloration
+            y -- L'ordonnee a partir de laquelle commencer la coloration
+            case_size -- La taille de la case a colorer
+            color -- La couleur a appliquer sur la case (en format RVB)
+        """
         rect = QRect(pos[1]*case_size+x, pos[0]*case_size+y, case_size, case_size)
         painter = QPainter(self.pixmap)
         painter.setBrush(QColor(color[0], color[1], color[2], color[3]))
@@ -90,6 +115,9 @@ class Image(QLabel):
 
 
     def draw_path(self, path:list, x:int, y:int, case_size:int):
+        """
+            Dessine le chemin a suivre
+        """
         pas = 255//len(path)
         rouge = 0
         bleu = 255
@@ -101,6 +129,9 @@ class Image(QLabel):
 
 
     def mousePressEvent(self, event):
+        """
+            Emet un click event avec les bonnes valeurs
+        """
         if self.selecting_start or self.selecting_end:
             if event.button() == Qt.MouseButton.LeftButton:
                 for i in range(len(self.grid)):
@@ -113,6 +144,7 @@ class Image(QLabel):
                             elif self.selecting_end:
                                 self.endClicked.emit((i, j))
                                 self.selecting_end = False
+
 
 class MainWidget(QWidget):
     def __init__(self):
@@ -159,9 +191,15 @@ class Left(QWidget):
 
 
     def generate(self):
+        """
+            Emet un evenement de click sur le bouton generer
+        """
         self.generateClicked.emit()
 
     def erase(self):
+        """
+            Emet un evenement de click sur le bouton effacer
+        """
         self.eraseClicked.emit()
 
 
@@ -196,9 +234,15 @@ class Selection(QWidget):
 
 
     def add(self):
+        """
+            Emet un evenement de click sur le bouton ajouter un produit
+        """
         self.addClicked.emit()
 
     def update_product_list(self):
+        """
+            Emet un evenement d'update de la liste
+        """
         self.updateList.emit()
 
 
@@ -223,6 +267,9 @@ class Liste(QWidget):
 
 
     def delete(self):
+        """
+            Emet l'evenement de suppression de la liste
+        """
         self.deleteClicked.emit()
 
 class Up(QWidget):
@@ -264,12 +311,21 @@ class Buttons(QWidget):
 
 
     def random_pos(self):
+        """
+            Emet l'evenement de click sur le bouton position aleatoire
+        """
         self.randomStart.emit()
 
     def select_pos(self):
+        """
+            Emet l'evenement de click sur le bouton selection de position
+        """
         self.selectStart.emit()
 
     def select_end(self):
+        """
+            Emet l'evenement de click sur le bouton selection de sortie
+        """
         self.selectEnd.emit()
 
 
@@ -303,14 +359,18 @@ class VueSecondApp(QMainWindow):
 
         self.show()
 
+
     def getPathToProduct(self):
         self.mainWidget.generatePath()
+
 
     def setPos(self):
         self.mainWidget.setLocation()
 
+
     def setGoal(self):
         self.mainWidget.destinationPicked()
+
 
     def updatePlan(self, image_path = None):
         self.new_product_list = QComboBox()
@@ -319,11 +379,14 @@ class VueSecondApp(QMainWindow):
         self.mainWidget.main_layout.removeWidget(self.mainWidget.image)
         self.mainWidget.showPlan(image_path)
 
+
     def setProject(self):
         self.loadClicked.emit()
 
+
     def viewInfos(self):
         self.infosClicked.emit()
+
 
     def updateInfos(self, infos: dict):
         self.project_infos = infos
@@ -334,9 +397,6 @@ class VueSecondApp(QMainWindow):
 ## -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
-
     app = QApplication(sys.argv)
-
     fenetre = VueSecondApp()
-
     sys.exit(app.exec())

@@ -2,6 +2,7 @@ import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QFileDialog
 from PyQt6.QtCore import QSize, Qt, pyqtSignal
 
+
 class NewProjectApp(QWidget):
 
     infosSignal = pyqtSignal(dict)
@@ -72,7 +73,9 @@ class NewProjectApp(QWidget):
 
 
     def create(self):
-        # valeurs saisies
+        """
+            Entre dans l'attribut infos les valeurs saisies dans la fenetre du nouveau projet
+        """
         self.infos["project_name"] = self.project_name.text()
         self.infos["project_author"] = self.project_author.text()
         self.infos["shop_name"] = self.shop_name.text()
@@ -83,6 +86,9 @@ class NewProjectApp(QWidget):
 
 
     def browse(self):
+        """
+            Ouvre un file dialog pour que l'utilisateur puisse choisir le plan du magasin
+        """
         image = QFileDialog.getOpenFileName(self, "Choisissez le plan", "../images", "Fichier PNG (*.png) ;; Fichier JPG (*.jpg *.jpeg) ;; Fichier SVG (*.svg)")[0]
 
         if image:

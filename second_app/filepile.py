@@ -13,20 +13,25 @@ import numpy as np
 ## Déclaration de la classe File
 ###########################################################################
 
+
 class File(object):        # en anglais : queue
     
     def __init__(self, capacite : int = 6):
-        'Constructeur de la classe'
+        """
+            Constructeur de la classe
+        """
         self.__elements : np.array = np.array([None for _ in range(capacite)])
         self.__nb_elements : int  = 0
         self.__capacite : int = capacite           # par défaut, la capacité est fixée à 6 éléments
         self.__tete : int = 0                      # indice de la tête de file
+
 
     @property
     def nombre_elements(self) -> int:
         "Méthode publique, renvoie le nombre d'éléments dans la file."
         return self.__nb_elements
     
+
     @property
     def capacite(self) -> int:
         '''Méthode publique, renvoie la capacité de la file.'''
@@ -86,6 +91,7 @@ class File(object):        # en anglais : queue
 ## Déclaration de la classe Pile
 ###########################################################################
 
+
 class Pile(object):        # en anglais : stack
     
     def __init__(self, capacite :int = 6):
@@ -99,6 +105,7 @@ class Pile(object):        # en anglais : stack
     def nombre_elements(self) -> int:
         '''Méthode publique, renvoie le nombre d'éléments dans la pile.'''
         return self.__nb_elements
+
 
     @property
     def capacite(self) -> int:

@@ -18,6 +18,7 @@ class VueFirstApp(QMainWindow):
     openClicked = pyqtSignal()
     deleteClicked = pyqtSignal()
 
+
     def __init__(self):
         super().__init__()
 
@@ -49,19 +50,20 @@ class VueFirstApp(QMainWindow):
 
 
     def applyBrightTheme(self):
-        '''
-            Méthode applyBrightTheme: permet à l'utilisateur de basculer vers le thème clair
-        '''
+        """
+            Bascule vers le theme clair
+        """
 
         fichier_style = open("../fichiers_qss/lightstyle.qss", 'r')
         with fichier_style:
             qss = fichier_style.read()
             self.setStyleSheet(qss)
 
+
     def applyDarkTheme(self):
-        '''
-            Méthode applyDarkTheme: permet à l'utilisateur de basculer vers le thème sombre
-        '''
+        """
+            Bascule vers le theme sombre
+        """
 
         fichier_style = open("../fichiers_qss/darkstyle.qss", 'r')
         with fichier_style:
@@ -70,70 +72,69 @@ class VueFirstApp(QMainWindow):
 
 
     def applyMaterialDark(self):
-        '''
-            Méthode applyMaterialDark: permet à l'utilisateur de basculer vers le thème Material Dark
-        '''
+        """
+            Bascule vers le theme Material Dark
+        """
 
         fichier_style = open("../fichiers_qss/materialdark.qss", 'r')
         with fichier_style:
             qss = fichier_style.read()
             self.setStyleSheet(qss)
 
-    def resetTheme(self):
-        '''
-            Méthode resetTheme: permet à l'utilisateur de basculer vers le thème par défaut
-        '''
 
+    def resetTheme(self):
+        """
+            Bascule sur le theme par defaut du systeme
+        """
         self.setStyleSheet('')
 
-    def new(self):
-        '''
-            Méthode new: permet à l'utilisateur de créer un nouveau magasin
-            Elle émet simplement un signal vers l'extérieur
-        '''
 
+    def new(self):
+        """
+            Permet à l'utilisateur de créer un nouveau magasin
+            Elle émet simplement un signal vers l'extérieur
+        """
         self.newClicked.emit()
 
-    def open(self):
-        '''
-            Méthode open: permet à l'utilisateur d'ouvrir un fichier de magasin
-            Elle émet simplement un signal vers l'extérieur
-        '''
 
+    def open(self):
+        """
+            Permet à l'utilisateur d'ouvrir un fichier de magasin
+            Elle émet simplement un signal vers l'extérieur
+        """
         self.openClicked.emit()
 
-    def save(self):
-        '''
-            Méthode save: permet à l'utilisateur d'enregistrer le magasin courant
-            Elle émet simplement un signal vers l'extérieur
-        '''
 
+    def save(self):
+        """
+            Permet à l'utilisateur d'enregistrer le magasin courant
+            Elle émet simplement un signal vers l'extérieur
+        """
         self.saveClicked.emit()
 
-    def save_as(self):
-        '''
-            Méthode save_as: permet à l'utilisateur d'enregistrer le magasin courant à l'emplacement choisi
-            Elle émet simplement un signal vers l'extérieur
-        '''
 
+    def save_as(self):
+        """
+            Permet à l'utilisateur d'enregistrer le magasin courant à l'emplacement choisi
+            Elle émet simplement un signal vers l'extérieur
+        """
         self.saveasClicked.emit()
 
-    def load(self):
-        '''
-            Méthode load: permet à l'utilisateur de charger le plan d'un magasin
-            Elle émet simplement un signal vers l'extérieur
-        '''
 
+    def load(self):
+        """
+            Permet à l'utilisateur de charger le plan d'un magasin
+            Elle émet simplement un signal vers l'extérieur
+        """
         self.loadClicked.emit()
 
+
     def delete(self):
-        '''
-            Méthode delete: permet à l'utilisateur de supprimer le projet actuellement ouvert
+        """
+            Permet à l'utilisateur de supprimer le projet actuellement ouvert
             Elle émet simplement un signal vers l'éxterieur
-        '''
-
+        """
         self.deleteClicked.emit()
-
 
 
 class MainWidget(QWidget):
@@ -178,6 +179,9 @@ class WidthSlider(QSlider):
 
 
     def move_grid(self, value:int):
+        """
+            Emet le signal de deplacement de la grille
+        """
         self.gridMoved.emit(value)
 
 
@@ -211,7 +215,11 @@ class Grid(QLabel):
         self.y = 0
         self.update_image()
 
+
     def update_image(self):
+        """
+            Modifie le plan actuellement affiche par celui choisi
+        """
         self.pixmap = QPixmap(self.image)
 
         if self.pixmap.width() >= 1100:
@@ -224,7 +232,15 @@ class Grid(QLabel):
 
         self.setPixmap(self.pixmap)
 
+
     def draw_grid(self, grid:list, case_size:int):
+        """
+            Dessine la grille sur la vue
+
+            Keyword arguments:
+            grid -- les informations de la grille (nombre de cases et colonnes)
+            case_size -- la taille de chaque case
+        """
         if grid:
             width = len(grid[0])
         else:
@@ -257,6 +273,9 @@ class Grid(QLabel):
 
 
     def mousePressEvent(self, event):
+        """
+            Traite le click sur la grille et envoie l'evenement avec les bonnes valeurs
+        """
         if event.button() == Qt.MouseButton.LeftButton:
             for i in range(len(self.grid)):
                 for j in range(len(self.grid[i])):
@@ -320,16 +339,19 @@ class Options(QWidget):
 
 
     def dessinClicked(self):
+        """
+            Emet l'evenement de click sur le bouton dessin de la grille
+        """
         self.drawClicked.emit((self.column_number.value(), self.row_number.value(), self.case_size.value()))
 
     def effaceClicked(self):
+        """
+            Emet l'evenement de click sur le bouton de suppression de la grille
+        """
         self.clearClicked.emit()
 
 
-
-
 if __name__ == "__main__":
-
     app = QApplication(sys.argv)
     fenetre = VueFirstApp()
     sys.exit(app.exec())

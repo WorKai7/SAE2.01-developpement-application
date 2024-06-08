@@ -25,7 +25,11 @@ class ModeleSecondApp:
         self.destination = ()
         self.product_list = []
     
+
     def open(self):
+        """
+            Demande a l'utilisateur de selectionner un projet et l'ouvre
+        """
         path = QFileDialog.getOpenFileName(caption="Choisissez un projet", filter="Json Files (*.json)")[0]
 
         if path:
@@ -115,6 +119,9 @@ class ModeleSecondApp:
     #     return liste_parcours
 
     def open_project(self):
+        """
+            Ouvre un projet 
+        """
         path = QFileDialog.getOpenFileName(caption='Ouvrir plan', directory="../projets/", filter="Json Files (*.json)")[0]
 
         if path:
@@ -123,7 +130,11 @@ class ModeleSecondApp:
                 self.convert_str_to_tuples()
                 self.current_infos["file_path"] = path
 
+
     def convert_str_to_tuples(self):
+        """
+            Convertis les chaines de caractere du pattern en tuples
+        """
         converted_pattern = {}
 
         for key, value in self.current_infos["pattern"].items():
