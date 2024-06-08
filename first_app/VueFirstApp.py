@@ -239,12 +239,14 @@ class Grid(QLabel):
             for j in range(width):
                 case = QRect(j*case_size+self.x, i*case_size+self.y, case_size, case_size)
                 row.append(case)
+
                 if grid[i][j]:
                     painter.setBrush(QColor(0, 0, 0, 128))
                     painter.drawRect(case)
                     painter.setBrush(QColor(0, 0, 0, 0))
                 else:
                     painter.drawRect(case)
+
             self.grid.append(row)
         self.setPixmap(pixmap)
         painter.end()

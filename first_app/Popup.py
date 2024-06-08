@@ -188,13 +188,16 @@ class Right(QLabel):
 
     def mousePressEvent(self, event):
         for i in range(len(self.rect_list)):
+
             if self.rect_list[i].contains(event.pos()):
                 if self.rect_infos[i][1] == "green":
                     self.painter.setBrush(QColor(Qt.GlobalColor.red))
                     self.painter.drawRect(self.rect_list[i])
                     self.rect_infos[i][1] = "red"
+
                 elif self.rect_infos[i][1] == "red":
                     self.painter.setBrush(QColor(Qt.GlobalColor.green))
                     self.painter.drawRect(self.rect_list[i])
                     self.rect_infos[i][1] = "green"
+
                 self.setPixmap(self.schema)

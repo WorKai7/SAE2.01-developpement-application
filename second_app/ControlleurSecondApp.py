@@ -82,11 +82,13 @@ class Controller():
         self.vue.mainWidget.image.selecting_end = True
         self.vue.mainWidget.left.label.show()
 
+
     def select_start(self, coordinates:tuple):
         if self.modele.current_infos["grid"]:
             self.modele.current_position = coordinates
             self.update_vue()
             self.vue.mainWidget.left.label.hide()
+
 
     def select_end(self, coordinates:tuple):
         if self.modele.current_infos["grid"]:
@@ -129,6 +131,7 @@ class Controller():
 
     def generate_path(self):
         path = self.modele.generateAllPaths()
+
         if path:
             self.vue.mainWidget.image.draw_path(path, self.modele.current_infos["x"], self.modele.current_infos["y"],
                                                 self.modele.current_infos["case_size"])

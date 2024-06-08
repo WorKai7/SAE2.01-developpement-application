@@ -32,9 +32,11 @@ class ModeleFirstApp:
 
     def save_as(self):
         path = QFileDialog.getSaveFileName(caption="Enregistrer sous", directory="../projets", filter="Projet JSON")[0] + ".json"
+
         if path:
             if path[-5:] != ".json":
                 path += ".json"
+
             self.current_infos["file_path"] = path
             with open(path, 'w', encoding="utf8") as f:
                 self.convert_tuples_to_str()
@@ -43,6 +45,7 @@ class ModeleFirstApp:
 
     def open(self):
         path = QFileDialog.getOpenFileName(caption="Choisissez un projet", directory="../projets", filter="Projet JSON (*.json)")[0]
+
         if path:
             with open(path, 'r', encoding="utf8") as f:
                 self.current_infos = json.load(f)
@@ -54,6 +57,7 @@ class ModeleFirstApp:
 
     def load_image(self):
         image = QFileDialog.getOpenFileName(caption="Sélectionner un plan", directory="../images", filter="*.png *.jpg *.jpeg *.svg")[0]
+
         if image:
             self.current_infos["image"] = image
             return True

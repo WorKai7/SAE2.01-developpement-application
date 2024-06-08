@@ -52,6 +52,7 @@ class Image(QLabel):
 
         self.setPixmap(self.pixmap)
 
+
     def draw_grid(self, grid:list, x:int, y:int, case_size:int):
         if grid:
             width = len(grid[0])
@@ -66,12 +67,14 @@ class Image(QLabel):
             for j in range(width):
                 case = QRect(j*case_size+x, i*case_size+y, case_size, case_size)
                 row.append(case)
+
                 if grid[i][j]:
                     painter.setBrush(QColor(0, 0, 0, 128))
                     painter.drawRect(case)
                     painter.setBrush(QColor(0, 0, 0, 0))
                 else:
                     painter.drawRect(case)
+
             self.grid.append(row)
         self.setPixmap(self.pixmap)
         painter.end()
@@ -84,6 +87,7 @@ class Image(QLabel):
         painter.drawRect(rect)
         painter.end()
         self.setPixmap(self.pixmap)
+
 
     def draw_path(self, path:list, x:int, y:int, case_size:int):
         pas = 255//len(path)
@@ -111,12 +115,6 @@ class Image(QLabel):
                                 self.selecting_end = False
 
 class MainWidget(QWidget):
-
-    selectedPosition = pyqtSignal(bool, list)
-    selectedDestination = pyqtSignal()
-    generatePathClicked = pyqtSignal()
-    fetchProductList = pyqtSignal()
-
     def __init__(self):
         super().__init__()
 
@@ -129,27 +127,6 @@ class MainWidget(QWidget):
         layout.addWidget(self.left)
         layout.addWidget(self.image, alignment=Qt.AlignmentFlag.AlignCenter)
 
-
-
-
-    def getProductList(self):
-        self.fetchProductList.emit()
-
-    def setRandomPosition(self):
-        self.selectedPosition.emit(True, [])
-
-    def setLocation(self):
-        location = [0,0] ##Récupérer endroit cliqué par l'utilisateur puis envoyer dans signal
-        self.selectedPosition.emit(False, location)
-
-    def destinationPicked(self):
-        self.selectedDestination.emit()
-
-    def generatePath(self):
-        self.generatePathClicked.emit()
-
-    def showPathToDestination(self, path: list):
-        pass
 
 
 class Left(QWidget):

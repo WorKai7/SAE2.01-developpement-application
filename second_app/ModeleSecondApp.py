@@ -20,12 +20,14 @@ class ModeleSecondApp:
             "grid": [],
             "pattern": {}
         }
+
         self.current_position = ()
         self.destination = ()
         self.product_list = []
     
     def open(self):
         path = QFileDialog.getOpenFileName(caption="Choisissez un projet", filter="Json Files (*.json)")[0]
+
         if path:
             with open(path, 'r') as f:
                 self.current_infos = json.load(f)
@@ -114,6 +116,7 @@ class ModeleSecondApp:
 
     def open_project(self):
         path = QFileDialog.getOpenFileName(caption='Ouvrir plan', directory="../projets/", filter="Json Files (*.json)")[0]
+
         with open(path, 'r') as f:
             self.current_infos = json.load(f)
             self.convert_str_to_tuples()
