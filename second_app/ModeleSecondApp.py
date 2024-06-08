@@ -77,10 +77,14 @@ class ModeleSecondApp:
 
         while arrivee not in parcours:
             sommet = p1.depiler()
-            parcours.append(sommet)
-            for voisin in dico_graphe[sommet].keys():
-                if voisin not in parcours and not p1.contient(voisin):
-                    p1.empiler(voisin)
+            if sommet:
+                parcours.append(sommet)
+                for voisin in dico_graphe[sommet].keys():
+                    if voisin not in parcours and not p1.contient(voisin):
+                        p1.empiler(voisin)
+            else:
+                print("Erreur, position bloquée")
+                return []
 
         return parcours
 

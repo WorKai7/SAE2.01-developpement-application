@@ -90,12 +90,12 @@ class Image(QLabel):
 
 
     def draw_path(self, path:list, x:int, y:int, case_size:int):
-        pas = 255//len(path)
+        pas = 255/len(path)
         rouge = 0
         bleu = 255
 
         for i in range(len(path)):
-            self.draw_rect(path[i], x, y, case_size, (rouge, 0, bleu, 128))
+            self.draw_rect(path[i], x, y, case_size, (int(rouge), 0, int(bleu), 200))
             rouge += pas
             bleu -= pas
 

@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, copy
 from PyQt6.QtWidgets import QApplication, QMessageBox
 from VueFirstApp import VueFirstApp
 from ModeleFirstApp import ModeleFirstApp
@@ -110,6 +110,7 @@ class Controller:
 
     def clear_grid(self):
         self.vue.main_widget.right.grid.clear_grid()
+        self.modele.saved_grid = copy.deepcopy(self.modele.current_infos["grid"])
         self.modele.current_infos["grid"].clear()
 
 
