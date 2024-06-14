@@ -1,9 +1,9 @@
 # SAE Application 2.01 et 2.02
 
 ## Membres du groupe:
-- Vandewalle Jérôme
-- Arabah Yanis
-- Pruvost Scotty
+- Vandewalle Jérôme (Worcou)
+- Arabah Yanis (YanisArabah)
+- Pruvost Scotty (SparkasseLabank)
 - Pinceel Matthieu
 
 ## Bonus : Mot de passe
